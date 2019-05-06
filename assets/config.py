@@ -7,9 +7,6 @@ Created on Fri May  3 09:13:41 2019
 #Importando bibliotecas necessarias
 from os import path
 
-#Estabelece a pasta que contem as figuras
-img_dir = path.join(path.dirname(__file__), 'img')
-
 #Dados gerais do jogo
 
 #Tela
