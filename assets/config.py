@@ -16,3 +16,7 @@ img_dir = path.join(path.dirname(__file__), 'img')
 WIDTH = 800 #Largura
 HEIGHT = 500 #Altura
 FPS = 60 #Frames por segundo
+
+#Cores
+BLACK = (0, 0, 0)
+
