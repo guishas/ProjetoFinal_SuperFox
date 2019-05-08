@@ -1,10 +1,17 @@
 #Bibliotecas e importações
 import pygame
 from os import path
-from config import WIDTH, HEIGHT, FPS, BLACK
 
 #Diretorio das imagens
 img_dir = path.join(path.dirname(__file__), 'img')
+
+#Dados gerais do jogo
+WIDTH = 800
+HEIGHT = 500
+FPS = 60
+
+#Cores
+BLACK = (0, 0, 0)
 
 #Inicializacao do pygame
 pygame.init()
