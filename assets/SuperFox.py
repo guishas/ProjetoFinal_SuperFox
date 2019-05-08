@@ -50,7 +50,18 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
+    
+class Mob(pygame.sprite.Sprite):
+    
+    def __init__(self):
         
+        pygame.sprite.Sprite.__init__(self)
+        
+        mob_img = 
+        self.image = mob_img
+        
+        
+    
 #Inicializacao do pygame
 pygame.init()
 pygame.mixer.init()
@@ -66,6 +77,7 @@ clock = pygame.time.Clock()
     
 #Carrega o fundo do jogo
 background = pygame.image.load(path.join(img_dir, 'bg_fase1.png')).convert()
+background = pygame.transform.scale(background, (800, 500))
 background_rect = background.get_rect()
 
 #Carrega os sons do jogo
@@ -76,6 +88,9 @@ player = Player()
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+
+#Grupo mobs
+mobs = pygame.sprite.Group()
 
 #comando para evitar travamentos
 try:
@@ -99,7 +114,7 @@ try:
             if event.type == pygame.KEYDOWN:
                 #se apertou alguma tecla muda a velocidade
                 if pygame.key == pygame.K_LEFT:
-                    player.speedx = +6
+                    player.speedx = 6
                 if pygame.key == pygame.K_RIGHT:
                     player.speedx = -6
                     
@@ -107,9 +122,9 @@ try:
             if event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
                 if event.key == pygame.K_LEFT:
-                    player.speedx = -6
+                    player.speedx -= 6
                 if event.key == pygame.K_RIGHT:
-                    player.speedx = 6
+                    player.speedx += 6
                 
         #Atualiza os sprites
         all_sprites.update()
