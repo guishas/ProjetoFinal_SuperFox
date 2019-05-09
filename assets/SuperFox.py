@@ -13,6 +13,9 @@ FPS = 60
 #Cores
 BLACK = (0, 0, 0)
 
+#Gravidade
+gravidade = -0.5
+
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
@@ -42,15 +45,27 @@ class Player(pygame.sprite.Sprite):
         
         #Velocidade
         self.speedx = 0
+        self.speedy = 0
     
     def update(self):
         self.rect.x += self.speedx
+        player.jump()
         
         #Mantém dentro da tela
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
+        if self.rect.bottom > HEIGHT - 80:
+            self.rect.bottom = HEIGHT -80
+            self.speedy = 0
+        if self.rect.top < 0:
+            self.rect.top = 0
+            
+    #Classe de pulo
+    def jump(self):
+        self.speedy -= gravidade
+        self.rect.y += self.speedy
     
 
 class BlocoTijolo(pygame.sprite.Sprite):
@@ -136,6 +151,9 @@ try:
                     player.speedx -= 6
                 if event.key == pygame.K_RIGHT:
                     player.speedx += 6
+                #Jump
+                if event.key == pygame.K_SPACE:
+                    player.speedy -= 10
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
@@ -144,6 +162,7 @@ try:
                     player.speedx += 6
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 6
+        
                 
         #Atualiza os sprites
         all_sprites.update()
