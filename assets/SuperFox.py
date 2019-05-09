@@ -13,6 +13,7 @@ FPS = 60
 #Cores
 BLACK = (0, 0, 0)
 
+
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
     
@@ -54,11 +55,22 @@ class Player(pygame.sprite.Sprite):
 class Mob(pygame.sprite.Sprite):
     
     def __init__(self):
-        
+        #Construtor de classe
         pygame.sprite.Sprite.__init__(self)
-        
-        mob_img = 
-        self.image = mob_img
+        #Imagem do Mob
+       # mob_img = 
+       # self.image = mob_img
+        #Deixando a imagem transparente
+        self.image.set_colorkey(BLACK)
+        #Posicionamento
+        self.rect = self.image.get_rect()
+        #Velocidade do Mob
+        self.speedx = 5
+        #Melhorando sistema de colisão
+        self.radius = int(self.rect.width)
+     #Atualiza a posição   
+    def update(self):
+        self.rect.x += self.speedx
         
         
     
@@ -113,18 +125,19 @@ try:
             #verifica se apertou alguma tecla
             if event.type == pygame.KEYDOWN:
                 #se apertou alguma tecla muda a velocidade
-                if pygame.key == pygame.K_LEFT:
-                    player.speedx = 6
-                if pygame.key == pygame.K_RIGHT:
-                    player.speedx = -6
+                if event.key == pygame.K_LEFT:
+                    player.speedx -= 6
+                if event.key == pygame.K_RIGHT:
+                    player.speedx += 6
                     
             #verifica se soltou alguma tecla
             if event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
                 if event.key == pygame.K_LEFT:
-                    player.speedx -= 6
-                if event.key == pygame.K_RIGHT:
                     player.speedx += 6
+                if event.key == pygame.K_RIGHT:
+                    player.speedx -= 6
+                    
                 
         #Atualiza os sprites
         all_sprites.update()
