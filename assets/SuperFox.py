@@ -51,14 +51,6 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
     
-class Mob(pygame.sprite.Sprite):
-    
-    def __init__(self):
-        
-        pygame.sprite.Sprite.__init__(self)
-        
-        #mob_img = 
-        #self.image = mob_img
         
 class BlocoTijolo(pygame.sprite.Sprite):
     
