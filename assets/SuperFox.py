@@ -13,6 +13,7 @@ FPS = 60
 #Cores
 BLACK = (0, 0, 0)
 
+
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
     
@@ -51,7 +52,11 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
     
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> c1c383203baeb0b312f354e59f6873ba56e996ec
 class BlocoTijolo(pygame.sprite.Sprite):
     
     def __init__(self):
