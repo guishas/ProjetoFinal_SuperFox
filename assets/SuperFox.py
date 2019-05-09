@@ -51,12 +51,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
-    
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> c1c383203baeb0b312f354e59f6873ba56e996ec
 class BlocoTijolo(pygame.sprite.Sprite):
     
     def __init__(self):
