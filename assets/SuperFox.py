@@ -144,10 +144,6 @@ try:
                     player.speedx += 6
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 6
-<<<<<<< HEAD
-                    
-=======
->>>>>>> 0aebf18f6734142dbb8168f62dbbcdfe507061a8
                 
         #Atualiza os sprites
         all_sprites.update()
