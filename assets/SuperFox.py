@@ -56,6 +56,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
+
         if self.rect.bottom > HEIGHT - 80:
             self.rect.bottom = HEIGHT -80
             self.speedy = 0
@@ -70,7 +71,7 @@ class Player(pygame.sprite.Sprite):
 
 class BlocoTijolo(pygame.sprite.Sprite):
     
-    def __init__(self):
+    def __init__(self, x, y):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -88,10 +89,35 @@ class BlocoTijolo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         
         #posicao
-        self.rect.x = 100
-        self.rect.y = 250
+        self.rect.x = x
+        self.rect.y = y
         
         self.radius = 25
+listaPosicaoBlocos=[(100, 250), (140, 250), (180, 250),(260, 250)]
+
+class BlocoAmarelo(pygame.sprite.Sprite):
+    
+    def __init__(self, x, y):
+        
+        pygame.sprite.Sprite.__init__(self)
+        
+        #imagem
+        amarelo_img = pygame.image.load(path.join(img_dir, 'bloco_item.png')).convert()
+        self.image = amarelo_img
+        
+        self.image = pygame.transform.scale(amarelo_img, (40, 40))
+        
+        self.image.set_colorkey(BLACK)
+        
+        self.rect = self.image.get_rect()
+        
+        #posicao
+        self.rect.x = x
+        self.rect.y = y
+        
+        self.radius = 25
+listaPosicaoBlocosAmarelos=[(220, 250)]
+
 #Inicializacao do pygame
 pygame.init()
 pygame.mixer.init()
@@ -115,14 +141,19 @@ background_rect = background.get_rect()
 #Cria um player
 player = Player()
 
-#Cria um bloco de tijolo
-bloco = BlocoTijolo()
-
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
-all_sprites.add(bloco)
 
+#Cria blocos
+for x in range(0, 4, 1):
+    bloco=BlocoTijolo(listaPosicaoBlocos[x][0], listaPosicaoBlocos[x][1])
+    all_sprites.add(bloco)
+
+#Cria blocos amarelos(itens)
+    for x in range(0, 1, 1):
+        blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1])
+        all_sprites.add(blocoItem)
 #Grupo mobs
 mobs = pygame.sprite.Group()
 
