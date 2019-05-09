@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.image = player_img
         
         #Diminuindo o tamanho da imagem
-        self.image = pygame.transform.scale(player_img, (50, 38))
+        self.image = pygame.transform.scale(player_img, (70, 58))
         
         #Deixando transparente
         self.image.set_colorkey(BLACK)
@@ -52,28 +52,31 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
     
-class Mob(pygame.sprite.Sprite):
+
+class BlocoTijolo(pygame.sprite.Sprite):
     
     def __init__(self):
-        #Construtor de classe
+        
         pygame.sprite.Sprite.__init__(self)
-        #Imagem do Mob
-       # mob_img = 
-       # self.image = mob_img
-        #Deixando a imagem transparente
+        
+        #Imagem
+        brick_img = pygame.image.load(path.join(img_dir, 'bloco_tijolo.png')).convert()
+        self.image = brick_img
+        
+        #Diminuindo a imagem
+        self.image = pygame.transform.scale(brick_img, (40, 40))
+        
+        #Imagem transparente
         self.image.set_colorkey(BLACK)
+        
         #Posicionamento
         self.rect = self.image.get_rect()
-        #Velocidade do Mob
-        self.speedx = 5
-        #Melhorando sistema de colisão
-        self.radius = int(self.rect.width)
-     #Atualiza a posição   
-    def update(self):
-        self.rect.x += self.speedx
         
+        #posicao
+        self.rect.x = 100
+        self.rect.y = 250
         
-    
+        self.radius = 25
 #Inicializacao do pygame
 pygame.init()
 pygame.mixer.init()
@@ -97,9 +100,13 @@ background_rect = background.get_rect()
 #Cria um player
 player = Player()
 
+#Cria um bloco de tijolo
+bloco = BlocoTijolo()
+
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+all_sprites.add(bloco)
 
 #Grupo mobs
 mobs = pygame.sprite.Group()
@@ -123,7 +130,7 @@ try:
                 running = False
                 
             #verifica se apertou alguma tecla
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 #se apertou alguma tecla muda a velocidade
                 if event.key == pygame.K_LEFT:
                     player.speedx -= 6
@@ -131,13 +138,16 @@ try:
                     player.speedx += 6
                     
             #verifica se soltou alguma tecla
-            if event.type == pygame.KEYUP:
+            elif event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
                 if event.key == pygame.K_LEFT:
                     player.speedx += 6
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 6
+<<<<<<< HEAD
                     
+=======
+>>>>>>> 0aebf18f6734142dbb8168f62dbbcdfe507061a8
                 
         #Atualiza os sprites
         all_sprites.update()
