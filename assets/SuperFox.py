@@ -5,6 +5,7 @@ from os import path
 #Diretorio das imagens
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
+
 #Dados gerais do jogo
 WIDTH = 800
 HEIGHT = 500
@@ -172,6 +173,7 @@ def load_assets(img_dir, snd_dir):
     return assets
 
 #Inicializacao do pygame
+pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.init()
 pygame.mixer.init()
 
@@ -195,6 +197,7 @@ background_rect = background.get_rect()
 #Carrega os sons do jogo
 pygame.mixer.music.set_volume(0.2)
 jump_sound = assets['jump_sound']
+
 #Cria um player
 player = Player(assets['player_img'])
 
@@ -251,7 +254,7 @@ try:
                 #Jump
                 if event.key == pygame.K_SPACE:
                     jump_sound.play()
-                    player.speedy -= 10
+                    player.speedy -= 14
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
