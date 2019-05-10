@@ -46,6 +46,11 @@ class Player(pygame.sprite.Sprite):
         #Velocidade
         self.speedx = 0
         self.speedy = 0
+        
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        
+        self.frame_ticks = 50
     
     def update(self):
         self.rect.x += self.speedx
@@ -63,6 +68,18 @@ class Player(pygame.sprite.Sprite):
         if self.rect.top < 0:
             self.rect.top = 0
             
+        #verifica o tick atual
+        now = pygame.time.get_ticks()
+        
+        elapsed_ticks = now - self.last_update
+        
+        if elapsed_ticks > self.frame_ticks:
+            
+            self.last_update = now
+            
+            self.frame += 1
+            
+                
     #Classe de pulo
     def jump(self):
         self.speedy -= gravidade
@@ -205,6 +222,7 @@ player = Player(assets['player_img'])
 pipe = Pipes(assets['pipe_img'])
 
 #Grupos Geral
+blocosItem = pygame.sprite.Group()
 blocos = pygame.sprite.Group()
 pipes = pygame.sprite.Group()
 
@@ -212,6 +230,7 @@ pipes = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 all_sprites.add(pipe)
+all_sprites.add(blocosItem)
 
 #Cria blocos
 for x in range(0, len(listaPosicaoBlocos), 1):
@@ -223,7 +242,7 @@ for x in range(0, len(listaPosicaoBlocos), 1):
 for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
     blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1])
     all_sprites.add(blocoItem)
-    blocos.add(blocoItem)
+    blocosItem.add(blocoItem)
 
 #comando para evitar travamentos
 try:
@@ -266,6 +285,10 @@ try:
                 
         #Atualiza os sprites
         all_sprites.update()
+        
+        hits = pygame.sprite.spritecollide(player, blocos, False, pygame.sprite.collide_circle)
+        if hits:
+            bloco.kill()
         
         #A cada loop redesenha o fundo e os sprites
         screen.fill(BLACK)
