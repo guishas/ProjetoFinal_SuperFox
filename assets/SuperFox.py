@@ -193,6 +193,8 @@ assets = load_assets(img_dir, snd_dir)
 background = assets['background']
 background = pygame.transform.scale(background, (800, 500))
 background_rect = background.get_rect()
+background_rect2 = background_rect.copy()
+background_rect2.x += background_rect2.width
 
 #Carrega os sons do jogo
 pygame.mixer.music.set_volume(0.2)
@@ -266,10 +268,17 @@ try:
                 
         #Atualiza os sprites
         all_sprites.update()
+        background_rect.x -= 5
+        background_rect2.x -= 5
+        if background_rect.right < 0:
+            background_rect.x += background_rect.width*2
+        if background_rect2.right <0:
+            background_rect2.x += background_rect2.width*2
         
         #A cada loop redesenha o fundo e os sprites
         screen.fill(BLACK)
         screen.blit(background, background_rect)
+        screen.blit(background, background_rect2)
         all_sprites.draw(screen)
         
         #Depois de desenhar tudo inverte o display
