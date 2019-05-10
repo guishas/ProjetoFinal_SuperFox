@@ -21,13 +21,12 @@ gravidade = -0.5
 class Player(pygame.sprite.Sprite):
     
     #Construtor da classe
-    def __init__(self):
+    def __init__(self, player_img):
         
         #Construtor da classe pai
         pygame.sprite.Sprite.__init__(self)
         
         #Imagem do player
-        player_img = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
         self.image = player_img
         
         #Diminuindo o tamanho da imagem
@@ -67,7 +66,24 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         self.speedy -= gravidade
         self.rect.y += self.speedy
+
+class Pipes(pygame.sprite.Sprite):
     
+    def __init__(self, pipe_img):
+        
+        pygame.sprite.Sprite.__init__(self)
+        
+        #imagem
+        self.image = pipe_img
+        
+        self.image = pygame.transform.scale(pipe_img, (50, 80))
+        
+        self.image.set_colorkey(BLACK)
+        
+        self.rect = self.image.get_rect()
+        
+        self.rect.x = 720
+        self.rect.y = HEIGHT - 160
 
 class BlocoTijolo(pygame.sprite.Sprite):
     
@@ -76,7 +92,7 @@ class BlocoTijolo(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         #Imagem
-        brick_img = pygame.image.load(path.join(img_dir, 'bloco_tijolo.png')).convert()
+        brick_img = assets['bloco_tijolo']
         self.image = brick_img
         
         #Diminuindo a imagem
@@ -92,8 +108,7 @@ class BlocoTijolo(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         
-        self.radius = 25
-listaPosicaoBlocos=[(100, 250), (140, 250), (180, 250),(260, 250)]
+listaPosicaoBlocos=[(100, 250), (140, 250), (180, 250),(260, 250),(220, 110),(260, 110),(340, 110),(380, 110),(380, 250),(420, 250),(460, 250),(500, 250),(540, 250)]
 
 class BlocoAmarelo(pygame.sprite.Sprite):
     
@@ -102,10 +117,10 @@ class BlocoAmarelo(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         #imagem
-        amarelo_img = pygame.image.load(path.join(img_dir, 'bloco_item.png')).convert()
-        self.image = amarelo_img
+        blocoItem_img = assets['bloco_item']
+        self.image = blocoItem_img
         
-        self.image = pygame.transform.scale(amarelo_img, (40, 40))
+        self.image = pygame.transform.scale(blocoItem_img, (40, 40))
         
         self.image.set_colorkey(BLACK)
         
@@ -115,8 +130,25 @@ class BlocoAmarelo(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         
-        self.radius = 25
-listaPosicaoBlocosAmarelos=[(220, 250)]
+listaPosicaoBlocosAmarelos=[(220, 250),(300, 110)]
+
+#função assets (imagens e sons)
+def load_assets(img_dir):
+    assets = {}
+    assets['player_img'] = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
+    assets['bloco_tijolo'] = pygame.image.load(path.join(img_dir, 'bloco_tijolo.png')).convert()
+    assets['bloco_item'] = pygame.image.load(path.join(img_dir, 'bloco_item.png')).convert()
+    assets['background'] = pygame.image.load(path.join(img_dir, 'bg_fase1.png')).convert()
+    fox_walk = []
+    for i in range(1, 3, 1):
+        filename = 'fox_walk{}.png'.format(i)
+        walk = pygame.image.load(path.join(img_dir, filename)).convert()
+        walk = pygame.transform.scale(walk, (70, 58))
+        walk.set_colorkey(BLACK)
+        fox_walk.append(walk)
+    assets['fox_walk'] = fox_walk
+    assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
+    return assets
 
 #Inicializacao do pygame
 pygame.init()
@@ -130,32 +162,43 @@ pygame.display.set_caption("SuperFox by TeamAura")
 
 #Ajuste de velocidade
 clock = pygame.time.Clock()
+
+#carrega todos os assets e guarda em um dicionario
+assets = load_assets(img_dir)
     
 #Carrega o fundo do jogo
-background = pygame.image.load(path.join(img_dir, 'bg_fase1.png')).convert()
+background = assets['background']
 background = pygame.transform.scale(background, (800, 500))
 background_rect = background.get_rect()
 
 #Carrega os sons do jogo
 
 #Cria um player
-player = Player()
+player = Player(assets['player_img'])
+
+#Cria coisas
+pipe = Pipes(assets['pipe_img'])
+
+#Grupos Geral
+blocos = pygame.sprite.Group()
+pipes = pygame.sprite.Group()
 
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+all_sprites.add(pipe)
 
 #Cria blocos
-for x in range(0, 4, 1):
+for x in range(0, len(listaPosicaoBlocos), 1):
     bloco=BlocoTijolo(listaPosicaoBlocos[x][0], listaPosicaoBlocos[x][1])
     all_sprites.add(bloco)
+    blocos.add(bloco)
 
 #Cria blocos amarelos(itens)
-    for x in range(0, 1, 1):
-        blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1])
-        all_sprites.add(blocoItem)
-#Grupo mobs
-mobs = pygame.sprite.Group()
+for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
+    blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1])
+    all_sprites.add(blocoItem)
+    blocos.add(blocoItem)
 
 #comando para evitar travamentos
 try:
@@ -179,9 +222,10 @@ try:
             elif event.type == pygame.KEYDOWN:
                 #se apertou alguma tecla muda a velocidade
                 if event.key == pygame.K_LEFT:
-                    player.speedx -= 6
+                    player.speedx -= 4
+                    
                 if event.key == pygame.K_RIGHT:
-                    player.speedx += 6
+                    player.speedx += 4
                 #Jump
                 if event.key == pygame.K_SPACE:
                     player.speedy -= 10
@@ -190,10 +234,9 @@ try:
             elif event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
                 if event.key == pygame.K_LEFT:
-                    player.speedx += 6
+                    player.speedx += 4
                 if event.key == pygame.K_RIGHT:
-                    player.speedx -= 6
-        
+                    player.speedx -= 4
                 
         #Atualiza os sprites
         all_sprites.update()
