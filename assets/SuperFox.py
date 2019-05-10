@@ -4,7 +4,7 @@ from os import path
 
 #Diretorio das imagens
 img_dir = path.join(path.dirname(__file__), 'img')
-
+snd_dir = path.join(path.dirname(__file__), 'snd')
 #Dados gerais do jogo
 WIDTH = 800
 HEIGHT = 500
@@ -152,7 +152,7 @@ class BlocoUsado(pygame.sprite.Sprite):
 
         
 #função assets (imagens e sons)
-def load_assets(img_dir):
+def load_assets(img_dir, snd_dir):
     assets = {}
     assets['player_img'] = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
     assets['bloco_tijolo'] = pygame.image.load(path.join(img_dir, 'bloco_tijolo.png')).convert()
@@ -168,6 +168,7 @@ def load_assets(img_dir):
     assets['fox_walk'] = fox_walk
     assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
     assets['bloco_usado'] = pygame.image.load(path.join(img_dir, 'bloco_usado.png')).convert()
+    assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
     return assets
 
 #Inicializacao do pygame
@@ -184,7 +185,7 @@ pygame.display.set_caption("SuperFox by TeamAura")
 clock = pygame.time.Clock()
 
 #carrega todos os assets e guarda em um dicionario
-assets = load_assets(img_dir)
+assets = load_assets(img_dir, snd_dir)
     
 #Carrega o fundo do jogo
 background = assets['background']
@@ -192,7 +193,8 @@ background = pygame.transform.scale(background, (800, 500))
 background_rect = background.get_rect()
 
 #Carrega os sons do jogo
-
+pygame.mixer.music.set_volume(0.2)
+jump_sound = assets['jump_sound']
 #Cria um player
 player = Player(assets['player_img'])
 
@@ -248,6 +250,7 @@ try:
                     player.speedx += 4
                 #Jump
                 if event.key == pygame.K_SPACE:
+                    jump_sound.play()
                     player.speedy -= 10
                     
             #verifica se soltou alguma tecla
