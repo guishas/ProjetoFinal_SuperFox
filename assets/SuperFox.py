@@ -61,6 +61,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
+        if self.rect.top < 0:
+            self.rect.top = 0
 
         if self.rect.bottom > HEIGHT - 80:
             self.rect.bottom = HEIGHT -80
@@ -252,7 +254,7 @@ for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
 try:
     
     #Musica do jogo
-    music_sound.play()
+    music_sound.play(loops=-1)
     #Loop principal
     running = True
     
