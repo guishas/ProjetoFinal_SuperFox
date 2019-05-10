@@ -2,8 +2,9 @@
 import pygame
 from os import path
 
-#Diretorio das imagens
+#Diretorios
 img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
 
 #Dados gerais do jogo
 WIDTH = 800
@@ -133,7 +134,7 @@ class BlocoAmarelo(pygame.sprite.Sprite):
 listaPosicaoBlocosAmarelos=[(220, 250),(300, 110)]
 
 #função assets (imagens e sons)
-def load_assets(img_dir):
+def load_assets(img_dir, snd_dir):
     assets = {}
     assets['player_img'] = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
     assets['bloco_tijolo'] = pygame.image.load(path.join(img_dir, 'bloco_tijolo.png')).convert()
@@ -148,6 +149,7 @@ def load_assets(img_dir):
         fox_walk.append(walk)
     assets['fox_walk'] = fox_walk
     assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
+    assets['jump_snd'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
     return assets
 
 #Inicializacao do pygame
@@ -164,14 +166,18 @@ pygame.display.set_caption("SuperFox by TeamAura")
 clock = pygame.time.Clock()
 
 #carrega todos os assets e guarda em um dicionario
-assets = load_assets(img_dir)
+assets = load_assets(img_dir, snd_dir)
     
 #Carrega o fundo do jogo
 background = assets['background']
 background = pygame.transform.scale(background, (800, 500))
 background_rect = background.get_rect()
+background_rect2 = background_rect.copy()
+background_rect2.x += background_rect2.width
 
 #Carrega os sons do jogo
+pygame.mixer.music.set_volume(0.2)
+jump_snd = assets['jump_snd']
 
 #Cria um player
 player = Player(assets['player_img'])
@@ -228,7 +234,8 @@ try:
                     player.speedx += 4
                 #Jump
                 if event.key == pygame.K_SPACE:
-                    player.speedy -= 10
+                    jump_snd.play()
+                    player.speedy -= 14
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
@@ -240,10 +247,18 @@ try:
                 
         #Atualiza os sprites
         all_sprites.update()
+        background_rect.x -= 5
+        background_rect2.x -= 5
+        if background_rect.right < 0:
+            background_rect.x += background_rect.width*2
+        if background_rect2.right <0:
+            background_rect2.x += background_rect2.width*2
+            
         
         #A cada loop redesenha o fundo e os sprites
         screen.fill(BLACK)
         screen.blit(background, background_rect)
+        screen.blit(background, background_rect2)
         all_sprites.draw(screen)
         
         #Depois de desenhar tudo inverte o display
