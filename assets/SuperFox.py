@@ -187,7 +187,7 @@ def load_assets(img_dir, snd_dir):
     assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
     assets['bloco_usado'] = pygame.image.load(path.join(img_dir, 'bloco_usado.png')).convert()
     assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
-    assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.wav'))
+    assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.ogg'))
     return assets
 
 #Inicializacao do pygame
