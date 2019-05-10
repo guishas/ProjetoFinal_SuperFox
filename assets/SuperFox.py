@@ -187,6 +187,7 @@ def load_assets(img_dir, snd_dir):
     assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
     assets['bloco_usado'] = pygame.image.load(path.join(img_dir, 'bloco_usado.png')).convert()
     assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
+    assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.wav'))
     return assets
 
 #Inicializacao do pygame
@@ -216,6 +217,7 @@ background_rect2.x += background_rect2.width
 #Carrega os sons do jogo
 pygame.mixer.music.set_volume(0.2)
 jump_sound = assets['jump_sound']
+music_sound = assets['music_sound']
 
 #Cria um player
 player = Player(assets['player_img'])
@@ -249,6 +251,8 @@ for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
 #comando para evitar travamentos
 try:
     
+    #Musica do jogo
+    music_sound.play()
     #Loop principal
     running = True
     
