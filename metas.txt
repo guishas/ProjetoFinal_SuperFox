@@ -1,0 +1,8 @@
+Semana 1:
+- Background (Feito)
+- Personagem andando (Feito)
+- Raposa pulando (Feito)
+- Raposa pulando com imagem de pulo (Prazo: 10/05)
+- Raposa andando com imagens de Walk (Prazo: 10/05)
+
+
