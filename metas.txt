@@ -2,6 +2,12 @@ Semana 1:
 - Background (Feito)
 - Personagem andando (Feito)
 - Raposa pulando (Feito)
+Semana 2:
 - Raposa pulando com imagem de pulo (Prazo: 10/05)
 - Raposa andando com imagens de Walk (Prazo: 10/05)
-- Música: HARD prod. Labella
+- MÃºsica: HARD prod. Labella(feito)
+Semana 3:
+- Fazer o background andar somente quando o player andar(Prazo: 17/05)
+- Sprite collide(Prazo: 17/05)
+- Adicionar Mobs(Prazo: 17/05)
+- Adiconar mais efeitos de som(Prazo: 17/05)
