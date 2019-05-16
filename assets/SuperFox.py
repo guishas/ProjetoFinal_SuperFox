@@ -128,7 +128,9 @@ class BlocoTijolo(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         
-listaPosicaoBlocos=[(100, 250), (140, 250), (180, 250),(260, 250),(220, 110),(260, 110),(340, 110),(380, 110),(380, 250),(420, 250),(460, 250),(500, 250),(540, 250)]
+listaPosicaoBlocos=[(100, 250), (140, 250), (180, 250),(260, 250),(220, 110),
+(260, 110),(340, 110),(380, 110),(380, 250),(420, 250),(460, 250),(500, 250),
+(540, 250)]
 
 class BlocoAmarelo(pygame.sprite.Sprite):
     
@@ -299,10 +301,6 @@ try:
             background_rect.x += background_rect.width*2
         if background_rect2.right <0:
             background_rect2.x += background_rect2.width*2
-        
-        hits = pygame.sprite.spritecollide(player, blocos, False, pygame.sprite.collide_circle)
-        if hits:
-            bloco.kill()
         
         #A cada loop redesenha o fundo e os sprites
         screen.fill(BLACK)
