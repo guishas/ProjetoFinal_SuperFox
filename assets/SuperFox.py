@@ -341,9 +341,10 @@ try:
                 #Jump
 
                 if event.key == pygame.K_SPACE:
-                    player.state = PULANDO
-                    jump_sound.play()
-                    player.speedy -= 14
+                    if player.state == PARADO or player.state == ANDANDO:
+                        player.state = PULANDO
+                        jump_sound.play()
+                        player.speedy -= 14
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
