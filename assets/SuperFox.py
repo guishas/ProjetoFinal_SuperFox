@@ -410,11 +410,8 @@ try:
                 #Jump
 
                 if event.key == pygame.K_SPACE:
-<<<<<<< HEAD
-                    if player.state == PARADO or player.state == ANDANDO:
-=======
+
                     if player.rect.bottom == HEIGHT - 80 or player.rect.bottom == HEIGHT - 250 or player.rect.bottom == HEIGHT - 390:
->>>>>>> 20e8b0e646e05f8a5d5041c5d5b9834c4dd7ea74
                         player.state = PULANDO
                         jump_sound.play()
                         player.speedy -= 14
