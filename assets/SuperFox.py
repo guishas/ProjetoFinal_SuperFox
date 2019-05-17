@@ -228,7 +228,7 @@ def load_assets(img_dir, snd_dir):
     assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.ogg'))
     fox_walk = []
     for i in range(1, 3, 1):
-        filename = 'fox_walk{}.png'.format(i)
+        filename = 'fox_walk1.png'.format(i)
         walk = pygame.image.load(path.join(img_dir, filename)).convert()
         walk = pygame.transform.scale(walk, (70, 58))
         walk.set_colorkey(BLACK)
