@@ -17,6 +17,11 @@ BLACK = (0, 0, 0)
 #Gravidade
 gravidade = -0.5
 
+#Estados
+PARADO = 0
+PULANDO = 1
+CAINDO = 2
+
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
@@ -43,6 +48,9 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 20
         self.rect.bottom = HEIGHT - 80
         
+        #Estado do jogador
+        self.state = PARADO
+        
         #Velocidade
         self.speedx = 0
         self.speedy = 0
@@ -54,7 +62,8 @@ class Player(pygame.sprite.Sprite):
     
     def update(self):
         self.rect.x += self.speedx
-        player.jump()
+        self.speedy -= gravidade
+        self.rect.y += self.speedy
         
         #Mantém dentro da tela
         if self.rect.right > WIDTH:
@@ -70,6 +79,31 @@ class Player(pygame.sprite.Sprite):
         if self.rect.top < 0:
             self.rect.top = 0
             
+        #Atualiza o estado pra CAINDO
+        if self.speedy > 0:
+            self.state = CAINDO
+        #Define as colisões
+        colisoes = pygame.sprite.spritecollide(self, blocos, False)
+        
+        #Bota a posição do personagem para antes da colisão
+        for colisao in colisoes:
+            #Indo para baixo
+            if self.speedy > 0:
+                self.rect.bottom = colisao.rect.top
+                #Se colidiu, para de cair
+                self.speedy = 0
+                #atualiza o estado para PARADO
+                self.state = PARADO
+            #Indo para cima 
+            elif self.speedy < 0:
+                self.rect.top = colisao.rect.bottom
+                #Se colidiu, para de cair
+                self.speedy = 0
+                #atualiza para PARADO
+                self.state = PARADO
+                
+        
+            
         #verifica o tick atual
         now = pygame.time.get_ticks()
         
@@ -84,8 +118,10 @@ class Player(pygame.sprite.Sprite):
                 
     #Classe de pulo
     def jump(self):
-        self.speedy -= gravidade
-        self.rect.y += self.speedy
+        if self.state == PARADO:
+            self.speedy -= gravidade
+            self.rect.y += self.speedy
+            self.state = PULANDO
 
 class Pipes(pygame.sprite.Sprite):
     
@@ -279,9 +315,11 @@ try:
                 if event.key == pygame.K_RIGHT:
                     player.speedx += 4
                 #Jump
-                if event.key == pygame.K_SPACE:
-                    jump_sound.play()
-                    player.speedy -= 14
+                if player.state == PARADO:
+                    if event.key == pygame.K_SPACE:
+                        jump_sound.play()
+                        player.speedy -= 14
+                        player.state = PULANDO
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
