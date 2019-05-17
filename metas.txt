@@ -11,5 +11,9 @@ Semana 3:
 - Sprite collide (Feito)
 - Adicionar Mobs (Prazo: 17/05)
 - Adiconar mais efeitos de som (Feito)
+Semana 4:
+- Adiconar score
+- Adiconar vida
+
 
 

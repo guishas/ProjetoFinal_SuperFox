@@ -21,6 +21,8 @@ gravidade = -0.5
 PARADO = 0
 PULANDO = 1
 ANDANDO = 2
+NO_PULO = 3
+CAINDO = 4
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
@@ -84,10 +86,11 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT - 80:
             self.rect.bottom = HEIGHT -80
             self.speedy = 0
+            
         if self.rect.top < 0:
             self.rect.top = 0
             
-        #Atualiza o estado pra CAINDO
+        #Verifica o pulo, e muda imagem
         if self.speedy < 0:
             self.state = PULANDO
         
@@ -107,7 +110,6 @@ class Player(pygame.sprite.Sprite):
                 self.rect.top = colisao.rect.bottom
                 #Se colidiu, para de cair
                 self.speedy = 0
-
         
         if self.state == ANDANDO:    
             #verifica o tick atual
@@ -132,6 +134,7 @@ class Player(pygame.sprite.Sprite):
         
         elif self.state == PULANDO:
             self.image = self.pulando
+            self.state = NO_PULO
                 
         else:
             self.image = self.parado
@@ -142,8 +145,61 @@ class Player(pygame.sprite.Sprite):
  
         self.speedy -= gravidade
         self.rect.y += self.speedy
+    
+class Mob(pygame.sprite.Sprite):
+    
+    def __init__(self, mob_walk):
+        
+        pygame.sprite.Sprite.__init__(self)
+        
+        #imagem
+        self.animation = mob_walk
+        
+        self.image = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
+        
+        teste = self.image
+        
+        self.image = pygame.transform.scale(teste, (70, 58))
+        
+        self.image.set_colorkey(BLACK)
+        
+        self.rect = self.image.get_rect()
+        
+        self.rect.x = 860
+        self.rect.bottom = HEIGHT - 80
+        
+        self.speedx = -2
+        
+        self.frame = 0
    
-
+        self.last_update = pygame.time.get_ticks()
+        
+        self.frame_ticks = 200
+    
+    def update(self):
+        
+        self.rect.x += self.speedx
+        
+        now = pygame.time.get_ticks()
+        
+        elapsed_ticks = now - self.last_update
+        
+        if elapsed_ticks > self.frame_ticks:
+            
+            self.last_update = now
+            
+            center = self.rect.center
+            self.image = self.animation[self.frame]
+                
+            self.frame += 1
+                
+            if self.frame == len(self.animation):
+                self.frame = 0
+                    
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+        
+        
 class Pipes(pygame.sprite.Sprite):
     
     def __init__(self, pipe_img):
@@ -248,6 +304,14 @@ def load_assets(img_dir, snd_dir):
     assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
     assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.ogg'))
     assets['fox_jump'] = pygame.image.load(path.join(img_dir, 'fox_jump.png')).convert()
+    mob_walk = []
+    for i in range(1, 3, 1):
+        filename = 'mob_walk{}.png'.format(i)
+        mobwalk = pygame.image.load(path.join(img_dir, filename)).convert()
+        mobwalk = pygame.transform.scale(mobwalk, (70, 58))
+        mobwalk.set_colorkey(BLACK)
+        mob_walk.append(mobwalk)
+    assets['mob_walk'] = mob_walk
     return assets
 
 #Inicializacao do pygame
@@ -284,17 +348,22 @@ player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
 
 #Cria coisas
 pipe = Pipes(assets['pipe_img'])
+mob = Mob(assets['mob_walk'])
 
 #Grupos Geral
 blocosItem = pygame.sprite.Group()
 blocos = pygame.sprite.Group()
 pipes = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
+
+mobs.add(mob)
 
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 all_sprites.add(pipe)
 all_sprites.add(blocosItem)
+all_sprites.add(mob)
 
 #Cria blocos
 for x in range(0, len(listaPosicaoBlocos), 1):
@@ -341,7 +410,11 @@ try:
                 #Jump
 
                 if event.key == pygame.K_SPACE:
+<<<<<<< HEAD
                     if player.state == PARADO or player.state == ANDANDO:
+=======
+                    if player.rect.bottom == HEIGHT - 80 or player.rect.bottom == HEIGHT - 250 or player.rect.bottom == HEIGHT - 390:
+>>>>>>> 20e8b0e646e05f8a5d5041c5d5b9834c4dd7ea74
                         player.state = PULANDO
                         jump_sound.play()
                         player.speedy -= 14
@@ -359,12 +432,12 @@ try:
                     
         #Atualiza os sprites
         all_sprites.update()
-        background_rect.x -= 5
-        background_rect2.x -= 5
-        if background_rect.right < 0:
-            background_rect.x += background_rect.width*2
-        if background_rect2.right <0:
-            background_rect2.x += background_rect2.width*2
+        #background_rect.x -= 5
+        #background_rect2.x -= 5
+        #if background_rect.right < 0:
+            #background_rect.x += background_rect.width*2
+        #if background_rect2.right <0:
+            #background_rect2.x += background_rect2.width*2
         
         hits = pygame.sprite.spritecollide(player, blocos, False, pygame.sprite.collide_circle)
         if hits:
