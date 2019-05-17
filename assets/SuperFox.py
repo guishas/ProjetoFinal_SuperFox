@@ -20,20 +20,24 @@ gravidade = -0.5
 #Estados
 PARADO = 0
 PULANDO = 1
-CAINDO = 2
-
+ANDANDO = 2
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
     
     #Construtor da classe
-    def __init__(self, player_img):
+    def __init__(self, player_img, fox_walk, fox_jump):
         
         #Construtor da classe pai
         pygame.sprite.Sprite.__init__(self)
         
         #Imagem do player
         self.image = player_img
+        self.walking = fox_walk
+        self.pulando = fox_jump
+        
+        self.pulando = pygame.transform.scale(fox_jump, (70, 58))
+        self.pulando.set_colorkey(BLACK)
         
         #Diminuindo o tamanho da imagem
         self.image = pygame.transform.scale(player_img, (70, 58))
@@ -51,6 +55,8 @@ class Player(pygame.sprite.Sprite):
         #Estado do jogador
         self.state = PARADO
         
+        self.animation = fox_walk
+        
         #Velocidade
         self.speedx = 0
         self.speedy = 0
@@ -58,7 +64,9 @@ class Player(pygame.sprite.Sprite):
         self.frame = 0
         self.last_update = pygame.time.get_ticks()
         
-        self.frame_ticks = 50
+        self.frame_ticks = 200
+        
+        self.parado = self.image
     
     def update(self):
         self.rect.x += self.speedx
@@ -80,8 +88,9 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
             
         #Atualiza o estado pra CAINDO
-        if self.speedy > 0:
-            self.state = CAINDO
+        if self.speedy < 0:
+            self.state = PULANDO
+        
         #Define as colisões
         colisoes = pygame.sprite.spritecollide(self, blocos, False)
         
@@ -92,36 +101,48 @@ class Player(pygame.sprite.Sprite):
                 self.rect.bottom = colisao.rect.top
                 #Se colidiu, para de cair
                 self.speedy = 0
-                #atualiza o estado para PARADO
-                self.state = PARADO
+
             #Indo para cima 
             elif self.speedy < 0:
                 self.rect.top = colisao.rect.bottom
                 #Se colidiu, para de cair
                 self.speedy = 0
-                #atualiza para PARADO
-                self.state = PARADO
+
+        
+        if self.state == ANDANDO:    
+            #verifica o tick atual
+            now = pygame.time.get_ticks()
+        
+            elapsed_ticks = now - self.last_update
+        
+            if elapsed_ticks > self.frame_ticks:
+            
+                self.last_update = now
+            
+                center = self.rect.center
+                self.image = self.animation[self.frame]
                 
+                self.frame += 1
+                
+                if self.frame == len(self.animation):
+                    self.frame = 0
+                    
+                self.rect = self.image.get_rect()
+                self.rect.center = center
         
-            
-        #verifica o tick atual
-        now = pygame.time.get_ticks()
-        
-        elapsed_ticks = now - self.last_update
-        
-        if elapsed_ticks > self.frame_ticks:
-            
-            self.last_update = now
-            
-            self.frame += 1
-            
+        elif self.state == PULANDO:
+            self.image = self.pulando
+                
+        else:
+            self.image = self.parado
+            self.state = PARADO
                 
     #Classe de pulo
     def jump(self):
-        if self.state == PARADO:
-            self.speedy -= gravidade
-            self.rect.y += self.speedy
-            self.state = PULANDO
+ 
+        self.speedy -= gravidade
+        self.rect.y += self.speedy
+   
 
 class Pipes(pygame.sprite.Sprite):
     
@@ -226,6 +247,7 @@ def load_assets(img_dir, snd_dir):
     assets['bloco_usado'] = pygame.image.load(path.join(img_dir, 'bloco_usado.png')).convert()
     assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
     assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.ogg'))
+    assets['fox_jump'] = pygame.image.load(path.join(img_dir, 'fox_jump.png')).convert()
     return assets
 
 #Inicializacao do pygame
@@ -258,7 +280,7 @@ jump_sound = assets['jump_sound']
 music_sound = assets['music_sound']
 
 #Cria um player
-player = Player(assets['player_img'])
+player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
 
 #Cria coisas
 pipe = Pipes(assets['pipe_img'])
@@ -311,24 +333,29 @@ try:
                 #se apertou alguma tecla muda a velocidade
                 if event.key == pygame.K_LEFT:
                     player.speedx -= 4
+                    player.state = ANDANDO
                     
                 if event.key == pygame.K_RIGHT:
                     player.speedx += 4
+                    player.state = ANDANDO
                 #Jump
-                if player.state == PARADO:
-                    if event.key == pygame.K_SPACE:
-                        jump_sound.play()
-                        player.speedy -= 14
-                        player.state = PULANDO
+
+                if event.key == pygame.K_SPACE:
+                    player.state = PULANDO
+                    jump_sound.play()
+                    player.speedy -= 14
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
                 if event.key == pygame.K_LEFT:
                     player.speedx += 4
+                    player.state = PARADO
+                    
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 4
-                
+                    player.state = PARADO
+                    
         #Atualiza os sprites
         all_sprites.update()
         background_rect.x -= 5
