@@ -14,6 +14,10 @@ FPS = 60
 #Cores
 BLACK = (0, 0, 0)
 
+STILL = 0
+WALKING = 1
+JUMPING = 2
+
 #Gravidade
 gravidade = -0.5
 
@@ -22,7 +26,7 @@ gravidade = -0.5
 class Player(pygame.sprite.Sprite):
     
     #Construtor da classe
-    def __init__(self, player_img):
+    def __init__(self, player_img, fox_walk, fox_jump):
         
         #Construtor da classe pai
         pygame.sprite.Sprite.__init__(self)
@@ -32,6 +36,12 @@ class Player(pygame.sprite.Sprite):
         
         #Diminuindo o tamanho da imagem
         self.image = pygame.transform.scale(player_img, (70, 58))
+        
+        self.animation = fox_walk
+        
+        self.pulando = fox_jump
+        self.pulando = pygame.transform.scale(fox_jump, (70, 58))
+        self.pulando.set_colorkey(BLACK)
         
         #Deixando transparente
         self.image.set_colorkey(BLACK)
@@ -47,10 +57,13 @@ class Player(pygame.sprite.Sprite):
         self.speedx = 0
         self.speedy = 0
         
+        self.state = STILL
         self.frame = 0
         self.last_update = pygame.time.get_ticks()
         
-        self.frame_ticks = 50
+        self.frame_ticks = 200
+        
+        self.parado = self.image
     
     def update(self):
         self.rect.x += self.speedx
@@ -69,24 +82,53 @@ class Player(pygame.sprite.Sprite):
             self.speedy = 0
         if self.rect.top < 0:
             self.rect.top = 0
-            
-        #verifica o tick atual
-        now = pygame.time.get_ticks()
         
-        elapsed_ticks = now - self.last_update
+        if self.state == WALKING:
+            
+            #verifica o tick atual
+            now = pygame.time.get_ticks()
         
-        if elapsed_ticks > self.frame_ticks:
+            elapsed_ticks = now - self.last_update
             
-            self.last_update = now
+            if elapsed_ticks > self.frame_ticks:
             
-            self.frame += 1
+                self.last_update = now
             
+                #Armazena a posição do centro da imagem
+                center = self.rect.center
+                #Atualiza a imagem atual
+                self.image = self.animation[self.frame]
                 
+                self.frame += 1
+                
+                if self.frame == len(self.animation):
+                    self.frame = 0
+                    
+                #Atualiza detalhes de posicionamento
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                
+        elif self.state == JUMPING:
+            self.image = self.pulando
+            
+        else:
+            self.image = self.parado
+        
     #Classe de pulo
     def jump(self):
+        
         self.speedy -= gravidade
         self.rect.y += self.speedy
 
+class Mob(pygame.sprite.Sprite):
+    
+    def __init__(self, mob_walk):
+        
+        pygame.sprite.Sprite.__init__(self)
+        
+        #imagem
+        #self.image = 
+        
 class Pipes(pygame.sprite.Sprite):
     
     def __init__(self, pipe_img):
@@ -180,6 +222,10 @@ def load_assets(img_dir, snd_dir):
     assets['bloco_tijolo'] = pygame.image.load(path.join(img_dir, 'bloco_tijolo.png')).convert()
     assets['bloco_item'] = pygame.image.load(path.join(img_dir, 'bloco_item.png')).convert()
     assets['background'] = pygame.image.load(path.join(img_dir, 'bg_fase1.png')).convert()
+    assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
+    assets['bloco_usado'] = pygame.image.load(path.join(img_dir, 'bloco_usado.png')).convert()
+    assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
+    assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.ogg'))
     fox_walk = []
     for i in range(1, 3, 1):
         filename = 'fox_walk{}.png'.format(i)
@@ -188,10 +234,15 @@ def load_assets(img_dir, snd_dir):
         walk.set_colorkey(BLACK)
         fox_walk.append(walk)
     assets['fox_walk'] = fox_walk
-    assets['pipe_img'] = pygame.image.load(path.join(img_dir, 'pipes_fase1.png')).convert()
-    assets['bloco_usado'] = pygame.image.load(path.join(img_dir, 'bloco_usado.png')).convert()
-    assets['jump_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'jump_sound.wav'))
-    assets['music_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'music_sound.ogg'))
+    mob_walk = []
+    for i in range(1, 3, 1):
+        filename = 'mob_walk{}.png'.format(i)
+        mobwalk = pygame.image.load(path.join(img_dir, filename)).convert()
+        mobwalk = pygame.transform.scale(mobwalk, (70, 58))
+        mobwalk.set_colorkey(BLACK)
+        mob_walk.append(mobwalk)
+        assets['mob_walk'] = mob_walk
+        assets['fox_jump'] = pygame.image.load(path.join(img_dir, 'fox_jump.png')).convert()
     return assets
 
 #Inicializacao do pygame
@@ -224,7 +275,7 @@ jump_sound = assets['jump_sound']
 music_sound = assets['music_sound']
 
 #Cria um player
-player = Player(assets['player_img'])
+player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
 
 #Cria coisas
 pipe = Pipes(assets['pipe_img'])
@@ -277,11 +328,15 @@ try:
                 #se apertou alguma tecla muda a velocidade
                 if event.key == pygame.K_LEFT:
                     player.speedx -= 4
+                    player.state = WALKING
                     
                 if event.key == pygame.K_RIGHT:
                     player.speedx += 4
+                    player.state = WALKING
+                    
                 #Jump
                 if event.key == pygame.K_SPACE:
+                    player.state = JUMPING
                     jump_sound.play()
                     player.speedy -= 14
                     
@@ -290,8 +345,10 @@ try:
                 #se soltou muda a velocidade
                 if event.key == pygame.K_LEFT:
                     player.speedx += 4
+                    player.state = STILL
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 4
+                    player.state = STILL
                 
         #Atualiza os sprites
         all_sprites.update()
