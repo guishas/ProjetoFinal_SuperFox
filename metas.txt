@@ -8,8 +8,8 @@ Semana 2:
 - Música: HARD prod. Labella (Feito)
 Semana 3:
 - Fazer o background andar somente quando o player andar (Prazo: 17/05)
-- Sprite collide (Prazo: 17/05)
+- Sprite collide (Feito)
 - Adicionar Mobs (Prazo: 17/05)
-- Adiconar mais efeitos de som (Prazo: 17/05)
+- Adiconar mais efeitos de som (Feito)
 
 
