@@ -406,6 +406,7 @@ def load_assets(img_dir, snd_dir):
     assets['explosion_anim'] = explosion_anim
     assets['destruction_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'expl6.wav'))
     assets['score_font'] = pygame.font.Font(path.join(fnt_dir, 'PressStart2P.ttf'), 28)
+    assets['fox_life'] = pygame.image.load(path.join(img_dir, 'fox_healthpoint.png')).convert()
     return assets
 
 #Inicializacao do pygame
@@ -546,7 +547,7 @@ try:
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
         if hits:
             player.kill()
-
+            mob.kill()
             lifes -= 1
             if lifes == 0:   
                 death_sound.play()
@@ -588,6 +589,10 @@ try:
         screen.blit(text_surface, text_rect)
         
         #colocando a vida na tela
+        text_surface = score_font.render(chr(9829) * lifes, True, YELLOW)
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (WIDTH - 790, 10)
+        screen.blit(text_surface, text_rect)
         
         #Depois de desenhar tudo inverte o display
         pygame.display.flip()
