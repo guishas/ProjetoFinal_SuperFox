@@ -491,6 +491,10 @@ for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
 #CArrega o placar de score
 score_font = assets['score_font']
 
+fox_life = assets['fox_life']
+fox_life = pygame.transform.scale(fox_life, (80, 80))
+fox_life.set_colorkey(BLACK)
+
 #comando para evitar travamentos
 try:
     
@@ -603,7 +607,7 @@ try:
         text_rect = text_surface.get_rect()
         text_rect.topleft = (WIDTH - 790, 10)
         screen.blit(text_surface, text_rect)
-        
+            
         #colocando munição na tela
         #text_surface = score_font.render(assets['fireball'] + 'X {:02d}'.format(ammo), True)
         #text_rect = text_surface.get_rect()
