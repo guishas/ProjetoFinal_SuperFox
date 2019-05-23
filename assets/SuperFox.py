@@ -144,6 +144,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.image = self.parado
             self.state = PARADO
+        self.mask = pygame.mask.from_surface(self.image)
                 
     #Classe de pulo
     def jump(self):
@@ -202,6 +203,7 @@ class Mob(pygame.sprite.Sprite):
                 self.frame = 0
                     
             self.rect = self.image.get_rect()
+            self.mask = pygame.mask.from_surface(self.image)
             self.rect.center = center
         
         
@@ -303,6 +305,7 @@ class Fireball(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(fireball, (35, 30))
         
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         self.speedx = 7
         
@@ -542,7 +545,7 @@ try:
         #Atualiza os sprites
         all_sprites.update()
         
-        hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
+        hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
         if hits:
             death_sound.play()
             music_sound.stop()
@@ -550,7 +553,7 @@ try:
             time.sleep(3)
             running = False
         
-        hits = pygame.sprite.groupcollide(mobs, fireballs, True, True)
+        hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
             m = Mob(assets['mob_walk'])
             all_sprites.add(m)
