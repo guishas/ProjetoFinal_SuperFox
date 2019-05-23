@@ -546,16 +546,18 @@ try:
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
         if hits:
             player.kill()
+
             lifes -= 1
             if lifes == 0:   
                 death_sound.play()
                 music_sound.stop()
                 player.kill()
                 time.sleep(3)
-                pygame.quit()
+                running =  False
             else: 
                 player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
                 all_sprites.add(player)
+
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True)
         for hit in hits:
