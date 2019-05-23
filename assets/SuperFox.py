@@ -100,7 +100,7 @@ class Player(pygame.sprite.Sprite):
             self.state = PULANDO
         
         #Define as colisões
-        colisoes = pygame.sprite.spritecollide(self, blocos, False)
+        colisoes = pygame.sprite.spritecollide(self, blocos, False, pygame.sprite.collide_mask)
         
         #Bota a posição do personagem para antes da colisão
         for colisao in colisoes:
@@ -144,6 +144,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.image = self.parado
             self.state = PARADO
+        self.mask = pygame.mask.from_surface(self.image)
                 
     #Classe de pulo
     def jump(self):
@@ -202,6 +203,7 @@ class Mob(pygame.sprite.Sprite):
                 self.frame = 0
                     
             self.rect = self.image.get_rect()
+            self.mask = pygame.mask.from_surface(self.image)
             self.rect.center = center
         
         if self.rect.x < 0:
@@ -246,6 +248,7 @@ class BlocoTijolo(pygame.sprite.Sprite):
         
         #Posicionamento
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         #posicao
         self.rect.x = x
@@ -268,6 +271,7 @@ class BlocoAmarelo(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         #posicao
         self.rect.x = x
@@ -289,6 +293,7 @@ class BlocoUsado(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         self.rect.x = x
         self.rect.y = y
@@ -306,6 +311,7 @@ class Fireball(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(fireball, (35, 30))
         
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         self.speedx = 7
         
@@ -409,6 +415,7 @@ def load_assets(img_dir, snd_dir):
     assets['explosion_anim'] = explosion_anim
     assets['destruction_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'expl6.wav'))
     assets['score_font'] = pygame.font.Font(path.join(fnt_dir, 'PressStart2P.ttf'), 28)
+    assets['fox_life'] = pygame.image.load(path.join(img_dir, 'fox_healthpoint.png')).convert()
     return assets
 
 #Inicializacao do pygame
@@ -548,10 +555,10 @@ try:
         #Atualiza os sprites
         all_sprites.update()
         
-        hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
+        hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
         if hits:
             player.kill()
-            lifes -= 1            
+            lifes -= 1
             if lifes == 0:   
                 death_sound.play()
                 music_sound.stop()
@@ -563,7 +570,7 @@ try:
                 all_sprites.add(player)
 
         
-        hits = pygame.sprite.groupcollide(mobs, fireballs, True, True)
+        hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
             m = Mob(assets['mob_walk'])
             all_sprites.add(m)
@@ -592,6 +599,10 @@ try:
         screen.blit(text_surface, text_rect)
         
         #colocando a vida na tela
+        text_surface = score_font.render(chr(9829) * lifes, True, YELLOW)
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (WIDTH - 790, 10)
+        screen.blit(text_surface, text_rect)
         
         #colocando munição na tela
         #text_surface = score_font.render(assets['fireball'] + 'X {:02d}'.format(ammo), True)
