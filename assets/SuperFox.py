@@ -1,10 +1,13 @@
 #Bibliotecas e importações
 import pygame
 from os import path
+import random
+import time
 
 #Diretorio das imagens
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
+fnt_dir = path.join(path.dirname(__file__), 'font')
 
 #Dados gerais do jogo
 WIDTH = 800
@@ -13,6 +16,8 @@ FPS = 60
 
 #Cores
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
 
 #Gravidade
 gravidade = -0.5
@@ -165,10 +170,10 @@ class Mob(pygame.sprite.Sprite):
         
         self.rect = self.image.get_rect()
         
-        self.rect.x = 860
-        self.rect.bottom = HEIGHT - 80
+        self.rect.x = random.randrange(860, 900)
+        self.rect.bottom = HEIGHT - 85
         
-        self.speedx = -2
+        self.speedx = random.randrange(-5, -2)
         
         self.frame = 0
    
@@ -209,14 +214,16 @@ class Pipes(pygame.sprite.Sprite):
         #imagem
         self.image = pipe_img
         
-        self.image = pygame.transform.scale(pipe_img, (50, 80))
+        self.image = pygame.transform.scale(pipe_img, (70, 60))
+        
+        self.image = pygame.transform.rotate(self.image, 90)
         
         self.image.set_colorkey(BLACK)
         
         self.rect = self.image.get_rect()
         
-        self.rect.x = 720
-        self.rect.y = HEIGHT - 160
+        self.rect.x = 740
+        self.rect.y = HEIGHT - 150
 
 class BlocoTijolo(pygame.sprite.Sprite):
     
@@ -283,7 +290,81 @@ class BlocoUsado(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+class Fireball(pygame.sprite.Sprite):
+    
+    def __init__(self, fireball, x, y):
         
+        pygame.sprite.Sprite.__init__(self)
+        
+        self.image = fireball
+        
+        self.rect = self.image.get_rect()
+        
+        self.image.set_colorkey(BLACK)
+        
+        self.image = pygame.transform.scale(fireball, (35, 30))
+        
+        self.speedx = 7
+        
+        self.rect.x = x
+        self.rect.y = y
+    
+    def update(self):    
+        self.rect.x += self.speedx
+        
+        #se passar do fim da tela, morre
+        if self.rect.x < 0:
+            self.kill()
+            
+class Explosion(pygame.sprite.Sprite):
+    
+    def __init__(self, center, explosion_anim):
+
+        pygame.sprite.Sprite.__init__(self)
+        
+        #Carrega a animacao
+        self.explosion_anim = explosion_anim
+        
+        #Inicia o processo de animacao colocando a primeira imagem na tela
+        self.frame = 0
+        self.image = self.explosion_anim[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+            
+        #guarda o tick da primeira imagem
+        self.last_update = pygame.time.get_ticks()
+        
+        #Controle de ticks da animacao
+        self.frame_ticks = 50
+    
+    def update(self):
+        #Verifica o tick atual
+        now = pygame.time.get_ticks()
+        
+        #Verifica quantos ticks se passaram desde a ultima mudança de frame
+        elapsed_ticks = now - self.last_update
+        
+        #Se ja esta na hora de mudar a imagem
+        if elapsed_ticks > self.frame_ticks:
+            
+            #Marca o tick da nova imagem
+            self.last_update = now
+            
+            #avança um quadro
+            self.frame += 1
+            
+            #Verifica se ja chegou no final da animacao
+            if self.frame == len(self.explosion_anim):
+                #se sim, tchau!
+                self.kill()
+            else:
+                #Se ainda nao, troca imagem
+                center = self.rect.center
+                self.image = self.explosion_anim[self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+        
+            
 #função assets (imagens e sons)
 def load_assets(img_dir, snd_dir):
     assets = {}
@@ -308,10 +389,23 @@ def load_assets(img_dir, snd_dir):
     for i in range(1, 3, 1):
         filename = 'mob_walk{}.png'.format(i)
         mobwalk = pygame.image.load(path.join(img_dir, filename)).convert()
-        mobwalk = pygame.transform.scale(mobwalk, (70, 58))
+        mobwalk = pygame.transform.scale(mobwalk, (80, 68))
         mobwalk.set_colorkey(BLACK)
         mob_walk.append(mobwalk)
     assets['mob_walk'] = mob_walk
+    assets['fireball'] = pygame.image.load(path.join(img_dir, 'fireball.png')).convert()
+    assets['fireball_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'fireball_sound.wav'))
+    assets['death_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'death_sound.wav'))
+    explosion_anim = []
+    for i in range(9):
+        filename = 'regularExplosion0{}.png'.format(i)
+        img = pygame.image.load(path.join(img_dir, filename)).convert()
+        img = pygame.transform.scale(img, (32, 32))
+        img.set_colorkey(BLACK)
+        explosion_anim.append(img)
+    assets['explosion_anim'] = explosion_anim
+    assets['destruction_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'expl6.wav'))
+    assets['score_font'] = pygame.font.Font(path.join(fnt_dir, 'PressStart2P.ttf'), 28)
     return assets
 
 #Inicializacao do pygame
@@ -342,29 +436,36 @@ background_rect2.x += background_rect2.width
 pygame.mixer.music.set_volume(0.2)
 jump_sound = assets['jump_sound']
 music_sound = assets['music_sound']
+fireball_sound = assets['fireball_sound']
+death_sound = assets['death_sound']
+destruction_sound = assets['destruction_sound']
 
 #Cria um player
 player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
 
 #Cria coisas
 pipe = Pipes(assets['pipe_img'])
-mob = Mob(assets['mob_walk'])
-
+    
 #Grupos Geral
 blocosItem = pygame.sprite.Group()
 blocos = pygame.sprite.Group()
 pipes = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
+fireballs = pygame.sprite.Group()
 
-mobs.add(mob)
 
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 all_sprites.add(pipe)
 all_sprites.add(blocosItem)
-all_sprites.add(mob)
 
+#Cria mobs
+for i in range(5):
+    mob = Mob(assets['mob_walk'])
+    mobs.add(mob)
+    all_sprites.add(mob)
+    
 #Cria blocos
 for x in range(0, len(listaPosicaoBlocos), 1):
     bloco=BlocoTijolo(listaPosicaoBlocos[x][0], listaPosicaoBlocos[x][1])
@@ -377,6 +478,9 @@ for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
     all_sprites.add(blocoItem)
     blocosItem.add(blocoItem)
 
+#CArrega o placar de score
+score_font = assets['score_font']
+
 #comando para evitar travamentos
 try:
     
@@ -384,6 +488,8 @@ try:
     music_sound.play(loops=-1)
     #Loop principal
     running = True
+    
+    score = 0
     
     while running:
         
@@ -415,6 +521,12 @@ try:
                         player.state = PULANDO
                         jump_sound.play()
                         player.speedy -= 14
+                
+                if event.key == pygame.K_q:
+                    fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
+                    all_sprites.add(fireball)
+                    fireballs.add(fireball)
+                    fireball_sound.play()
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
@@ -429,6 +541,25 @@ try:
                     
         #Atualiza os sprites
         all_sprites.update()
+        
+        hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
+        if hits:
+            death_sound.play()
+            music_sound.stop()
+            player.kill()
+            time.sleep(4)
+            pygame.quit()
+        
+        hits = pygame.sprite.groupcollide(mobs, fireballs, True, True)
+        for hit in hits:
+            m = Mob(assets['mob_walk'])
+            all_sprites.add(m)
+            mobs.add(m)
+            destruction_sound.play()
+            explosao = Explosion(hit.rect.center, assets['explosion_anim'])
+            all_sprites.add(explosao)
+            score += 100
+            
         #background_rect.x -= 5
         #background_rect2.x -= 5
         #if background_rect.right < 0:
@@ -436,15 +567,16 @@ try:
         #if background_rect2.right <0:
             #background_rect2.x += background_rect2.width*2
         
-        hits = pygame.sprite.spritecollide(player, blocos, False, pygame.sprite.collide_circle)
-        if hits:
-            bloco.kill()
-        
         #A cada loop redesenha o fundo e os sprites
         screen.fill(BLACK)
         screen.blit(background, background_rect)
-        screen.blit(background, background_rect2)
         all_sprites.draw(screen)
+        
+        #colocando o score na tela
+        text_surface = score_font.render('{:08d}'.format(score), True, YELLOW)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (WIDTH/2, 10)
+        screen.blit(text_surface, text_rect)
         
         #Depois de desenhar tudo inverte o display
         pygame.display.flip()
