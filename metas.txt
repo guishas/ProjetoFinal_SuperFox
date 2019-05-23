@@ -7,13 +7,15 @@ Semana 2:
 - Raposa andando com imagens de Walk (Feito)
 - Música: HARD prod. Labella (Feito)
 Semana 3:
-- Fazer o background andar somente quando o player andar (Prazo: 17/05)
+- Fazer o background andar somente quando o player andar (Alterado)
 - Sprite collide (Feito)
-- Adicionar Mobs (Prazo: 17/05)
+- Adicionar Mobs (Feito)
 - Adiconar mais efeitos de som (Feito)
 Semana 4:
-- Adiconar score
-- Adiconar vida
-
-
-
+- Adiconar score (Feito)
+- Adiconar vida (Feito)
+- Mehorar a mecânica dos tiros (24/05)
+- Adicionar mecânica de munição (24/05)
+- Arrumar as imagens do jogo (24/05)
+- Colocar mais canos (24/05)
+- Colocar mais Mobs (24/05)

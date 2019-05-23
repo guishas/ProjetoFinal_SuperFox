@@ -548,7 +548,7 @@ try:
             music_sound.stop()
             player.kill()
             time.sleep(3)
-            pygame.quit()
+            running = False
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True)
         for hit in hits:
