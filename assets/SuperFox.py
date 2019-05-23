@@ -100,7 +100,7 @@ class Player(pygame.sprite.Sprite):
             self.state = PULANDO
         
         #Define as colisões
-        colisoes = pygame.sprite.spritecollide(self, blocos, False)
+        colisoes = pygame.sprite.spritecollide(self, blocos, False, pygame.sprite.collide_mask)
         
         #Bota a posição do personagem para antes da colisão
         for colisao in colisoes:
@@ -245,6 +245,7 @@ class BlocoTijolo(pygame.sprite.Sprite):
         
         #Posicionamento
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         #posicao
         self.rect.x = x
@@ -267,6 +268,7 @@ class BlocoAmarelo(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         #posicao
         self.rect.x = x
@@ -288,6 +290,7 @@ class BlocoUsado(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         
         self.rect.x = x
         self.rect.y = y
