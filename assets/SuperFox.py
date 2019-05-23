@@ -298,11 +298,11 @@ class Fireball(pygame.sprite.Sprite):
         
         self.image = fireball
         
-        self.rect = self.image.get_rect()
-        
         self.image.set_colorkey(BLACK)
         
         self.image = pygame.transform.scale(fireball, (35, 30))
+        
+        self.rect = self.image.get_rect()
         
         self.speedx = 7
         
@@ -547,7 +547,7 @@ try:
             death_sound.play()
             music_sound.stop()
             player.kill()
-            time.sleep(4)
+            time.sleep(3)
             pygame.quit()
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True)
