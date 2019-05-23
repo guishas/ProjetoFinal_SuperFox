@@ -204,6 +204,9 @@ class Mob(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.center = center
         
+        if self.rect.x < 0:
+            self.kill()
+            
         
 class Pipes(pygame.sprite.Sprite):
     
@@ -313,7 +316,7 @@ class Fireball(pygame.sprite.Sprite):
         self.rect.x += self.speedx
         
         #se passar do fim da tela, morre
-        if self.rect.x < 0:
+        if self.rect.x > WIDTH:
             self.kill()
             
 class Explosion(pygame.sprite.Sprite):
@@ -491,6 +494,7 @@ try:
     
     score = 0
     lifes = 3
+    ammo = 20
     
     while running:
         
@@ -528,6 +532,7 @@ try:
                     all_sprites.add(fireball)
                     fireballs.add(fireball)
                     fireball_sound.play()
+                    ammo -= 1
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
@@ -546,8 +551,7 @@ try:
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
         if hits:
             player.kill()
-
-            lifes -= 1
+            lifes -= 1            
             if lifes == 0:   
                 death_sound.play()
                 music_sound.stop()
@@ -588,6 +592,12 @@ try:
         screen.blit(text_surface, text_rect)
         
         #colocando a vida na tela
+        
+        #colocando munição na tela
+        #text_surface = score_font.render(assets['fireball'] + 'X {:02d}'.format(ammo), True)
+        #text_rect = text_surface.get_rect()
+        #text_rect.bottomleft = (WIDTH - 50, 10)
+        #screen.blit(text_surface, text_rect)
         
         #Depois de desenhar tudo inverte o display
         pygame.display.flip()
