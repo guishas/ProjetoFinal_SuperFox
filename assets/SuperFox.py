@@ -493,6 +493,7 @@ try:
     running = True
     
     score = 0
+    lifes = 3
     
     while running:
         
@@ -547,11 +548,19 @@ try:
         
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
         if hits:
-            death_sound.play()
-            music_sound.stop()
             player.kill()
-            time.sleep(3)
-            running = False
+
+            lifes -= 1
+            if lifes == 0:   
+                death_sound.play()
+                music_sound.stop()
+                player.kill()
+                time.sleep(3)
+                running =  False
+            else: 
+                player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
+                all_sprites.add(player)
+
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
@@ -580,6 +589,8 @@ try:
         text_rect = text_surface.get_rect()
         text_rect.midtop = (WIDTH/2, 10)
         screen.blit(text_surface, text_rect)
+        
+        #colocando a vida na tela
         
         #Depois de desenhar tudo inverte o display
         pygame.display.flip()
