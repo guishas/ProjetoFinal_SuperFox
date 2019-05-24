@@ -107,14 +107,17 @@ class Player(pygame.sprite.Sprite):
             #Indo para baixo
             if self.speedy > 0:
                 self.rect.bottom = colisao.rect.top
-                #Se colidiu, para de cair
+                # Se colidiu com algo, para de cair
                 self.speedy = 0
-
-            #Indo para cima 
+                # Atualiza o estado para parado
+                self.state = PARADO
+            # Estava indo para cima
             elif self.speedy < 0:
                 self.rect.top = colisao.rect.bottom
-                #Se colidiu, para de cair
+                # Se colidiu com algo, para de cair
                 self.speedy = 0
+                # Atualiza o estado para parado
+                self.state = PARADO
         
         if self.state == ANDANDO:    
             #verifica o tick atual
@@ -208,10 +211,6 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            for i in range(2):
-                mob = Mob(assets['mob_walk'])
-                all_sprites.add(mob)
-                mobs.add(mob)
             
 class Pipes(pygame.sprite.Sprite):
     
@@ -573,6 +572,11 @@ try:
                     player.speedx -= 4
                     player.state = PARADO
                     
+            if mob.rect.x < 0:
+                mob = Mob(assets['mob_walk'])
+                all_sprites.add(mob)
+                mobs.add(mob)
+                
         #Atualiza os sprites
         all_sprites.update()
         
@@ -580,7 +584,11 @@ try:
         if hits:
             player.kill()
             for i in mobs:
-                mob.kill()
+                mobs.remove(mob)
+            for i in range(3):
+                mob = Mob(assets['mob_walk'])
+                all_sprites.add(mob)
+                mobs.add(mob)
             lifes -= 1
             if lifes == 0:   
                 death_sound.play()
@@ -591,7 +599,6 @@ try:
             else: 
                 player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
                 all_sprites.add(player)
-
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
