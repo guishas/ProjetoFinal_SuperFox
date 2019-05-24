@@ -529,7 +529,7 @@ player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
 
 #Cria coisas
 pipe = Pipes(assets['pipe_img'])
-    
+
 #Grupos Geral
 blocos = pygame.sprite.Group()
 pipes = pygame.sprite.Group()
@@ -751,8 +751,4 @@ try:
         pygame.display.flip()
 finally:
     pygame.quit()
-        
-        
-        
-        
         
