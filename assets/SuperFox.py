@@ -208,10 +208,6 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            for i in range(2):
-                mob = Mob(assets['mob_walk'])
-                all_sprites.add(mob)
-                mobs.add(mob)
             
 class Pipes(pygame.sprite.Sprite):
     
@@ -563,14 +559,20 @@ try:
                     player.speedx -= 4
                     player.state = PARADO
                     
-        #Atualiza os sprites
-        all_sprites.update()
+            if mob.rect.x < 0:
+                mob = Mob(assets['mob_walk'])
+                all_sprites.add(mob)
+                mobs.add(mob)
         
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
         if hits:
             player.kill()
             for i in mobs:
-                mob.kill()
+                mobs.remove(mob)
+            for i in range(3):
+                mob = Mob(assets['mob_walk'])
+                all_sprites.add(mob)
+                mobs.add(mob)
             lifes -= 1
             if lifes == 0:   
                 death_sound.play()
@@ -581,7 +583,9 @@ try:
             else: 
                 player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
                 all_sprites.add(player)
-
+                
+        #Atualiza os sprites
+        all_sprites.update()
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
