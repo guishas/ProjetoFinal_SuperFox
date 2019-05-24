@@ -107,14 +107,17 @@ class Player(pygame.sprite.Sprite):
             #Indo para baixo
             if self.speedy > 0:
                 self.rect.bottom = colisao.rect.top
-                #Se colidiu, para de cair
+                # Se colidiu com algo, para de cair
                 self.speedy = 0
-
-            #Indo para cima 
+                # Atualiza o estado para parado
+                self.state = PARADO
+            # Estava indo para cima
             elif self.speedy < 0:
                 self.rect.top = colisao.rect.bottom
-                #Se colidiu, para de cair
+                # Se colidiu com algo, para de cair
                 self.speedy = 0
+                # Atualiza o estado para parado
+                self.state = PARADO
         
         if self.state == ANDANDO:    
             #verifica o tick atual
