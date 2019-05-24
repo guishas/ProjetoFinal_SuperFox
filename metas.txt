@@ -14,8 +14,8 @@ Semana 3:
 Semana 4:
 - Adiconar score (Feito)
 - Adiconar vida (Feito)
-- Mehorar a mecânica dos tiros (24/05)
-- Adicionar mecânica de munição (24/05)
-- Arrumar as imagens do jogo (24/05)
+- Mehorar a mecânica dos tiros (Feito)
+- Adicionar mecânica de munição (Meio-Feito)
+- Arrumar as imagens do jogo (Feito)
 - Colocar mais canos (24/05)
 - Colocar mais Mobs (24/05)
