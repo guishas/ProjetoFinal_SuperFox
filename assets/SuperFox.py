@@ -724,13 +724,6 @@ try:
             explosao = Explosion(hit.rect.center, assets['explosion_anim'])
             all_sprites.add(explosao)
             score += 100
-                
-        #background_rect.x -= 5
-        #background_rect2.x -= 5
-        #if background_rect.right < 0:
-            #background_rect.x += background_rect.width*2
-        #if background_rect2.right <0:
-            #background_rect2.x += background_rect2.width*2
         
         #A cada loop redesenha o fundo e os sprites
         screen.fill(BLACK)
