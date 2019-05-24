@@ -563,6 +563,9 @@ try:
                 mob = Mob(assets['mob_walk'])
                 all_sprites.add(mob)
                 mobs.add(mob)
+                
+        #Atualiza os sprites
+        all_sprites.update()
         
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
         if hits:
@@ -583,9 +586,6 @@ try:
             else: 
                 player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
                 all_sprites.add(player)
-                
-        #Atualiza os sprites
-        all_sprites.update()
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
