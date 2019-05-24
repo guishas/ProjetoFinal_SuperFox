@@ -211,8 +211,11 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
+            for i in range(2):
+                mob = Mob(assets['mob_walk'])
+                all_sprites.add(mob)
+                mobs.add(mob)
             
-        
 class Pipes(pygame.sprite.Sprite):
     
     def __init__(self, pipe_img):
@@ -460,7 +463,6 @@ player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
 pipe = Pipes(assets['pipe_img'])
     
 #Grupos Geral
-blocosItem = pygame.sprite.Group()
 blocos = pygame.sprite.Group()
 pipes = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
@@ -471,7 +473,6 @@ fireballs = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 all_sprites.add(pipe)
-all_sprites.add(blocosItem)
 
 #Cria mobs
 for i in range(5):
@@ -489,10 +490,20 @@ for x in range(0, len(listaPosicaoBlocos), 1):
 for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
     blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1])
     all_sprites.add(blocoItem)
-    blocosItem.add(blocoItem)
+    blocos.add(blocoItem)
 
 #CArrega o placar de score
 score_font = assets['score_font']
+
+
+fireballimg = assets['fireball']
+fireballimg = pygame.transform.scale(fireballimg, (35, 35))
+fireballimg.set_colorkey(BLACK)
+
+fox_life = assets['fox_life']
+fox_life = pygame.transform.scale(fox_life, (80, 80))
+fox_life.set_colorkey(BLACK)
+
 
 #comando para evitar travamentos
 try:
@@ -538,11 +549,21 @@ try:
                         player.speedy -= 14
                 
                 if event.key == pygame.K_q:
-                    fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
-                    all_sprites.add(fireball)
-                    fireballs.add(fireball)
-                    fireball_sound.play()
-                    ammo -= 1
+                    if ammo > 0:
+                        fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
+                        all_sprites.add(fireball)
+                        fireballs.add(fireball)
+                        fireball_sound.play()
+                        ammo -= 1
+                        if ammo <= 0:
+                            ammo = 0
+                            
+                if event.key == pygame.K_r:
+                    time.sleep(3)
+                    while ammo < 20:
+                        ammo += 1
+                    
+                        
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
@@ -561,6 +582,8 @@ try:
         hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
         if hits:
             player.kill()
+            for i in mobs:
+                mob.kill()
             lifes -= 1
             if lifes == 0:   
                 death_sound.play()
@@ -575,9 +598,9 @@ try:
         
         hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
         for hit in hits:
-            m = Mob(assets['mob_walk'])
-            all_sprites.add(m)
-            mobs.add(m)
+            mob = Mob(assets['mob_walk'])
+            all_sprites.add(mob)
+            mobs.add(mob)
             destruction_sound.play()
             explosao = Explosion(hit.rect.center, assets['explosion_anim'])
             all_sprites.add(explosao)
@@ -606,12 +629,15 @@ try:
         text_rect = text_surface.get_rect()
         text_rect.topleft = (WIDTH - 790, 10)
         screen.blit(text_surface, text_rect)
-        
+            
         #colocando munição na tela
-        #text_surface = score_font.render(assets['fireball'] + 'X {:02d}'.format(ammo), True)
-        #text_rect = text_surface.get_rect()
-        #text_rect.bottomleft = (WIDTH - 50, 10)
-        #screen.blit(text_surface, text_rect)
+        text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
+        text_rect = text_surface.get_rect()
+        text_rect.bottomleft = (WIDTH - 140, 45)
+        img_rect = fireballimg.get_rect()
+        img_rect.topright = (WIDTH - 120, 10)
+        screen.blit(text_surface, text_rect)
+        screen.blit(fireballimg, img_rect)
         
         #Depois de desenhar tudo inverte o display
         pygame.display.flip()
