@@ -546,11 +546,21 @@ try:
                         player.speedy -= 14
                 
                 if event.key == pygame.K_q:
-                    fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
-                    all_sprites.add(fireball)
-                    fireballs.add(fireball)
-                    fireball_sound.play()
-                    ammo -= 1
+                    if ammo > 0:
+                        fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
+                        all_sprites.add(fireball)
+                        fireballs.add(fireball)
+                        fireball_sound.play()
+                        ammo -= 1
+                        if ammo <= 0:
+                            ammo = 0
+                            
+                if event.key == pygame.K_r:
+                    time.sleep(3)
+                    while ammo < 20:
+                        ammo += 1
+                    
+                        
                     
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
