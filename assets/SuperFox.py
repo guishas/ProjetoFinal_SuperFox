@@ -28,6 +28,9 @@ PULANDO = 1
 ANDANDO = 2
 NO_PULO = 3
 CAINDO = 4
+SHOOTING = 5
+RELOADING = 6
+RELOADED = 7
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
@@ -211,7 +214,70 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
+            mob = Mob(assets['mob_walk'])
+            all_sprites.add(mob)
+            mobs.add(mob)
             
+class Bird(pygame.sprite.Sprite):
+    
+    def __init__(self, mob_fly):
+        
+        pygame.sprite.Sprite.__init__(self)
+        
+        self.animation = mob_fly
+        
+        self.image = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
+        
+        teste = self.image
+        
+        self.image = pygame.transform.scale(teste, (70, 58))
+        
+        self.image.set_colorkey(BLACK)
+        
+        self.rect = self.image.get_rect()
+        
+        self.rect.x = random.randrange(860, 900)
+        self.rect.bottom = HEIGHT - 280
+        
+        self.speedx = random.randrange(-5, -2)
+        
+        self.frame = 0
+   
+        self.last_update = pygame.time.get_ticks()
+        
+        self.frame_ticks = 200
+    
+    def update(self):
+        
+        self.rect.x += self.speedx
+        
+        now = pygame.time.get_ticks()
+        
+        elapsed_ticks = now - self.last_update
+        
+        if elapsed_ticks > self.frame_ticks:
+            
+            self.last_update = now
+            
+            center = self.rect.center
+            self.image = self.animation[self.frame]
+                
+            self.frame += 1
+                
+            if self.frame == len(self.animation):
+                self.frame = 0
+                    
+            self.rect = self.image.get_rect()
+            self.mask = pygame.mask.from_surface(self.image)
+            self.rect.center = center
+        
+        if self.rect.x < 0:
+            self.kill()
+            bird = Bird(assets['mob_fly'])
+            all_sprites.add(bird)
+            birds.add(bird)
+        
+        
 class Pipes(pygame.sprite.Sprite):
     
     def __init__(self, pipe_img):
@@ -418,6 +484,14 @@ def load_assets(img_dir, snd_dir):
     assets['destruction_sound'] = pygame.mixer.Sound(path.join(snd_dir, 'expl6.wav'))
     assets['score_font'] = pygame.font.Font(path.join(fnt_dir, 'PressStart2P.ttf'), 28)
     assets['fox_life'] = pygame.image.load(path.join(img_dir, 'fox_healthpoint.png')).convert()
+    mob_fly = []
+    for i in range(1, 3, 1):
+        filename = 'mob2_fly{}.png'.format(i)
+        mobfly = pygame.image.load(path.join(img_dir, filename)).convert()
+        mobfly = pygame.transform.scale(mobfly, (80, 68))
+        mobfly.set_colorkey(BLACK)
+        mob_fly.append(mobfly)
+    assets['mob_fly'] = mob_fly
     return assets
 
 #Inicializacao do pygame
@@ -463,18 +537,25 @@ blocos = pygame.sprite.Group()
 pipes = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
 fireballs = pygame.sprite.Group()
-
+birds = pygame.sprite.Group()
 
 #Grupo sprites
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 all_sprites.add(pipe)
+all_sprites.add(birds)
+all_sprites.add(mobs)
 
 #Cria mobs
-for i in range(5):
+for i in range(4):
     mob = Mob(assets['mob_walk'])
     mobs.add(mob)
     all_sprites.add(mob)
+    
+for i in range (3):
+    bird = Bird(assets['mob_fly'])
+    all_sprites.add(bird)
+    birds.add(bird)
     
 #Cria blocos
 for x in range(0, len(listaPosicaoBlocos), 1):
@@ -511,20 +592,21 @@ try:
     
     score = 0
     lifes = 3
+    state = RELOADED
     ammo = 20
+    startTime = pygame.time.get_ticks()
     
     while running:
         
         #Ajusta o tick do jogo
         clock.tick(FPS)
-        
         #Eventos pygame
         for event in pygame.event.get():
-            
+        
             #verifica se foi fechado
             if event.type == pygame.QUIT:
                 running = False
-                
+            
             #verifica se apertou alguma tecla
             elif event.type == pygame.KEYDOWN:
                 #se apertou alguma tecla muda a velocidade
@@ -543,24 +625,31 @@ try:
                         player.state = PULANDO
                         jump_sound.play()
                         player.speedy -= 14
-                
-                if event.key == pygame.K_q:
-                    if ammo > 0:
-                        fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
-                        all_sprites.add(fireball)
-                        fireballs.add(fireball)
-                        fireball_sound.play()
-                        ammo -= 1
-                        if ammo <= 0:
-                            ammo = 0
+                        
+                if not state == RELOADING:
+                    if event.key == pygame.K_q:
+                        state = SHOOTING
+                        if state == SHOOTING:
+                            if ammo > 0:
+                                fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
+                                all_sprites.add(fireball)
+                                fireballs.add(fireball)
+                                fireball_sound.play()
+                                ammo -= 1
+                                if ammo <= 0:
+                                    ammo = 0
                             
                 if event.key == pygame.K_r:
-                    time.sleep(3)
-                    while ammo < 20:
-                        ammo += 1
-                    
+                    startTime = pygame.time.get_ticks()
+                    state = RELOADING
+                
+                if state == RELOADING:
+                    now = pygame.time.get_ticks()
+                    diferenca = now - startTime
+                    if diferenca > 3000:
+                        state = RELOADED
+                        ammo = 20
                         
-                    
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
@@ -571,11 +660,7 @@ try:
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 4
                     player.state = PARADO
-                    
-            if mob.rect.x < 0:
-                mob = Mob(assets['mob_walk'])
-                all_sprites.add(mob)
-                mobs.add(mob)
+                
                 
         #Atualiza os sprites
         all_sprites.update()
@@ -585,7 +670,7 @@ try:
             player.kill()
             for i in mobs:
                 mobs.remove(mob)
-            for i in range(3):
+            for i in range(2):
                 mob = Mob(assets['mob_walk'])
                 all_sprites.add(mob)
                 mobs.add(mob)
@@ -609,7 +694,37 @@ try:
             explosao = Explosion(hit.rect.center, assets['explosion_anim'])
             all_sprites.add(explosao)
             score += 100
-            
+        
+        hits = pygame.sprite.spritecollide(player, birds, False, pygame.sprite.collide_mask)
+        if hits:
+            player.kill()
+            for i in birds:
+                birds.remove(bird)
+            for i in range(3):
+                bird = Bird(assets['mob_fly'])
+                all_sprites.add(bird)
+                birds.add(bird)
+            lifes -= 1
+            if lifes == 0:   
+                death_sound.play()
+                music_sound.stop()
+                player.kill()
+                time.sleep(3)
+                running =  False
+            else: 
+                player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
+                all_sprites.add(player)
+                
+        hits = pygame.sprite.groupcollide(birds, fireballs, True, True, pygame.sprite.collide_mask)
+        for hit in hits:
+            bird = Bird(assets['mob_fly'])
+            all_sprites.add(bird)
+            birds.add(bird)
+            destruction_sound.play()
+            explosao = Explosion(hit.rect.center, assets['explosion_anim'])
+            all_sprites.add(explosao)
+            score += 100
+                
         #background_rect.x -= 5
         #background_rect2.x -= 5
         #if background_rect.right < 0:
