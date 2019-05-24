@@ -29,8 +29,6 @@ ANDANDO = 2
 NO_PULO = 3
 CAINDO = 4
 SHOOTING = 5
-RELOADING = 6
-RELOADED = 7
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
@@ -83,25 +81,6 @@ class Player(pygame.sprite.Sprite):
         self.speedy -= gravidade
         self.rect.y += self.speedy
         
-        #Mantém dentro da tela
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.y < 0:
-            self.rect.y = 0
-
-        if self.rect.bottom > HEIGHT - 80:
-            self.rect.bottom = HEIGHT -80
-            self.speedy = 0
-            
-        if self.rect.top < 0:
-            self.rect.top = 0
-            
-        #Verifica o pulo, e muda imagem
-        if self.speedy < 0:
-            self.state = PULANDO
-        
         #Define as colisões
         colisoes = pygame.sprite.spritecollide(self, blocos, False, pygame.sprite.collide_mask)
         
@@ -121,6 +100,25 @@ class Player(pygame.sprite.Sprite):
                 self.speedy = 0
                 # Atualiza o estado para parado
                 self.state = PARADO
+
+        #Mantém dentro da tela
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.y < 0:
+            self.rect.y = 0
+
+        if self.rect.bottom > HEIGHT - 80:
+            self.rect.bottom = HEIGHT -80
+            self.speedy = 0
+            
+        if self.rect.top < 0:
+            self.rect.top = 0
+            
+        #Verifica o pulo, e muda imagem
+        if self.speedy < 0:
+            self.state = PULANDO
         
         if self.state == ANDANDO:    
             #verifica o tick atual
@@ -589,10 +587,11 @@ try:
     music_sound.play(loops=-1)
     #Loop principal
     running = True
+    reloading = False
     
     score = 0
     lifes = 3
-    state = RELOADED
+    state = PARADO
     ammo = 20
     startTime = pygame.time.get_ticks()
     
@@ -626,30 +625,21 @@ try:
                         jump_sound.play()
                         player.speedy -= 14
                         
-                if not state == RELOADING:
+                if not reloading:
                     if event.key == pygame.K_q:
-                        state = SHOOTING
-                        if state == SHOOTING:
-                            if ammo > 0:
-                                fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
-                                all_sprites.add(fireball)
-                                fireballs.add(fireball)
-                                fireball_sound.play()
-                                ammo -= 1
-                                if ammo <= 0:
-                                    ammo = 0
+                        if ammo > 0:
+                            fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
+                            all_sprites.add(fireball)
+                            fireballs.add(fireball)
+                            fireball_sound.play()
+                            ammo -= 1
+                            if ammo <= 0:
+                                ammo = 0
                             
-                if event.key == pygame.K_r:
+                if event.key == pygame.K_r and not reloading and ammo < 20:
                     startTime = pygame.time.get_ticks()
-                    state = RELOADING
-                
-                if state == RELOADING:
-                    now = pygame.time.get_ticks()
-                    diferenca = now - startTime
-                    if diferenca > 3000:
-                        state = RELOADED
-                        ammo = 20
-                        
+                    reloading = True
+                    
             #verifica se soltou alguma tecla
             elif event.type == pygame.KEYUP:
                 #se soltou muda a velocidade
@@ -660,7 +650,13 @@ try:
                 if event.key == pygame.K_RIGHT:
                     player.speedx -= 4
                     player.state = PARADO
-                
+         
+        if reloading:
+            now = pygame.time.get_ticks()
+            diferenca = now - startTime
+            if diferenca > 2000:
+                reloading = False
+                ammo = 20
                 
         #Atualiza os sprites
         all_sprites.update()
