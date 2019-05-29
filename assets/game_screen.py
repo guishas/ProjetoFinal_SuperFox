@@ -4,7 +4,7 @@ Created on Wed May 29 15:18:30 2019
 
 @author: Usuario
 """
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, GAME, INIT
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT
 import pygame
 import random
 from os import path

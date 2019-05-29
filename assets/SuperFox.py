@@ -1,7 +1,7 @@
 #Bibliotecas e importações
 import pygame
 from os import path
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, GAME, INIT
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, BLACK, QUIT, GAME, INIT
 from init_screen import init_screen
 from game_screen import game_screen        
             
