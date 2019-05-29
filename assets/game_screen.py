@@ -4,7 +4,7 @@ Created on Wed May 29 15:18:30 2019
 
 @author: Usuario
 """
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, RED, YELLOW, QUIT
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, GAME, INIT
 import pygame
 import random
 from os import path
@@ -420,22 +420,8 @@ class Explosion(pygame.sprite.Sprite):
                 
 def game_screen(screen, assets):
     
-    #Inicializacao do pygame
-    pygame.mixer.pre_init(44100, -16, 2, 2048)
-    pygame.init()
-    pygame.mixer.init()
-    
-    #Tamanho da tela
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    
-    #Nome do jogo
-    pygame.display.set_caption("SuperFox by TeamAura")
-    
     #Ajuste de velocidade
     clock = pygame.time.Clock()
-    
-    #carrega todos os assets e guarda em um dicionario
-    assets = load_assets(img_dir, snd_dir)
         
     #Carrega o fundo do jogo
     background = assets['background']
@@ -510,8 +496,6 @@ def game_screen(screen, assets):
     
     #comando para evitar travamentos
     try:
-        
-        
         
         #Musica do jogo
         music_sound.play(loops=-1)
@@ -680,4 +664,6 @@ def game_screen(screen, assets):
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
             
-        return QUIT
+    return QUIT
+
+

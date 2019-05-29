@@ -6,7 +6,6 @@ Created on Wed May 29 14:59:25 2019
 """
 
 from config import QUIT, GAME, BLACK, FPS
-from os import path
 import pygame
 
 def init_screen(screen, assets):
