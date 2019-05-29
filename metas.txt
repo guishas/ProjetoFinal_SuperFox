@@ -19,3 +19,12 @@ Semana 4:
 - Arrumar as imagens do jogo (Feito)
 - Colocar mais canos (Feito)
 - Colocar mais Mobs (Feito)
+Semana 5 (última):
+- Tela inicial
+- Tela final (créditos)
+- Colocar somente uma vida
+- Tentar arrumar o mask collide com os blocos
+- Separar arquivos (ou não)
+- FIM!
+- Semana 6:
+- A GRANDE APRESENTAÇÃO!!! (04/06)
