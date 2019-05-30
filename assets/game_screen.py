@@ -500,16 +500,21 @@ def game_screen(screen, assets):
         #Musica do jogo
         music_sound.play(loops=-1)
         #Loop principal
-        running = True
+        PLAYING = 10
+        DYING = 11
+        DONE = 12
+        
         reloading = False
         
         score = 0
-        lifes = 3
+        lifes = 1
         state = PARADO
         ammo = 20
         startTime = pygame.time.get_ticks()
         
-        while running:
+        state = PLAYING
+        
+        while state != DONE:
             
             #Ajusta o tick do jogo
             clock.tick(FPS)
@@ -518,7 +523,8 @@ def game_screen(screen, assets):
             
                 #verifica se foi fechado
                 if event.type == pygame.QUIT:
-                    running = False
+                    state = DONE
+                    
                 
                 #verifica se apertou alguma tecla
                 elif event.type == pygame.KEYDOWN:
@@ -575,66 +581,54 @@ def game_screen(screen, assets):
             #Atualiza os sprites
             all_sprites.update()
             
-            hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
-            if hits:
-                player.kill()
-                for i in mobs:
-                    mobs.remove(mob)
-                for i in range(2):
+            if state == PLAYING:
+            
+                hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
+                if hits:
+                    state = DYING
+                    for i in range(2):
+                        mob = Mob(assets['mob_walk'])
+                        all_sprites.add(mob)
+                        mobs.add(mob)
+                    lifes -= 1
+                
+                hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
+                for hit in hits:
                     mob = Mob(assets['mob_walk'])
                     all_sprites.add(mob)
                     mobs.add(mob)
-                lifes -= 1
-                if lifes == 0:   
-                    death_sound.play()
-                    music_sound.stop()
-                    player.kill()
-                    time.sleep(3)
-                    running =  False
-                else: 
-                    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
-                    all_sprites.add(player)
-            
-            hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
-            for hit in hits:
-                mob = Mob(assets['mob_walk'])
-                all_sprites.add(mob)
-                mobs.add(mob)
-                destruction_sound.play()
-                explosao = Explosion(hit.rect.center, assets['explosion_anim'])
-                all_sprites.add(explosao)
-                score += 100
-            
-            hits = pygame.sprite.spritecollide(player, birds, False, pygame.sprite.collide_mask)
-            if hits:
-                player.kill()
-                for i in birds:
-                    birds.remove(bird)
-                for i in range(3):
+                    destruction_sound.play()
+                    explosao = Explosion(hit.rect.center, assets['explosion_anim'])
+                    all_sprites.add(explosao)
+                    score += 100
+                
+                hits = pygame.sprite.spritecollide(player, birds, False, pygame.sprite.collide_mask)
+                if hits:
+                    state = DYING
+                    for i in range(3):
+                        bird = Bird(assets['mob_fly'])
+                        all_sprites.add(bird)
+                        birds.add(bird)
+                    lifes -= 1
+                    
+                        
+                hits = pygame.sprite.groupcollide(birds, fireballs, True, True, pygame.sprite.collide_mask)
+                for hit in hits:
                     bird = Bird(assets['mob_fly'])
                     all_sprites.add(bird)
                     birds.add(bird)
-                lifes -= 1
-                if lifes == 0:   
-                    death_sound.play()
+                    destruction_sound.play()
+                    explosao = Explosion(hit.rect.center, assets['explosion_anim'])
+                    all_sprites.add(explosao)
+                    score += 100
+            elif state == DYING:
+                if lifes == 0:
                     music_sound.stop()
+                    death_sound.play()
                     player.kill()
                     time.sleep(3)
-                    running =  False
-                else: 
-                    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
-                    all_sprites.add(player)
+                    state = DONE
                     
-            hits = pygame.sprite.groupcollide(birds, fireballs, True, True, pygame.sprite.collide_mask)
-            for hit in hits:
-                bird = Bird(assets['mob_fly'])
-                all_sprites.add(bird)
-                birds.add(bird)
-                destruction_sound.play()
-                explosao = Explosion(hit.rect.center, assets['explosion_anim'])
-                all_sprites.add(explosao)
-                score += 100
-            
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
             screen.blit(background, background_rect)
@@ -663,7 +657,7 @@ def game_screen(screen, assets):
             
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
-            
+        
     return QUIT
 
-
+       
