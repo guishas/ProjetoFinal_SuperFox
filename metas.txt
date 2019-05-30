@@ -21,7 +21,7 @@ Semana 4:
 - Colocar mais Mobs (Feito)
 Semana 5 (última):
 - Tela inicial (Feito)
-- Tela final (créditos)
+- Tela final (Feito)
 - Colocar somente uma vida (Feito)
 - Tentar arrumar o mask collide com os blocos
 - Separar arquivos (ou não) (Feito)
