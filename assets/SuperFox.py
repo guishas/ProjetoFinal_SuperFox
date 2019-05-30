@@ -1,3 +1,4 @@
+
 #Bibliotecas e importações
 import pygame
 from os import path

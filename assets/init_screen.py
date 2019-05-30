@@ -26,7 +26,7 @@ def init_screen(screen, assets):
                 state = QUIT
                 running = False
             
-            if event.type == pygame.KEY_UP:
+            if event.type == pygame.KEYUP:
                 state = GAME
                 running = False
             
