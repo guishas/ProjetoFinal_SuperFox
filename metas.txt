@@ -20,11 +20,12 @@ Semana 4:
 - Colocar mais canos (Feito)
 - Colocar mais Mobs (Feito)
 Semana 5 (última):
-- Tela inicial
+- Tela inicial (Feito)
 - Tela final (créditos)
-- Colocar somente uma vida
+- Colocar somente uma vida (Feito)
 - Tentar arrumar o mask collide com os blocos
-- Separar arquivos (ou não)
+- Separar arquivos (ou não) (Feito)
+- Arquivo JSON para Highscores
 - FIM!
 - Semana 6:
 - A GRANDE APRESENTAÇÃO!!! (04/06)
