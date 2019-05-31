@@ -5,7 +5,7 @@ Created on Fri May 31 07:43:06 2019
 @author: Usuario
 """
 
-from config import QUIT, GAME, BLACK, FPS
+from config import QUIT, GAME, BLACK, FPS, WIDTH, HEIGHT
 import pygame
 
 def final_screen(screen, assets):
@@ -14,6 +14,8 @@ def final_screen(screen, assets):
     
     final = assets['tela_final']
     final_rect = final.get_rect()
+    final = pygame.transform.scale(final, (WIDTH, HEIGHT))
+    
     
     running = True
     while running:
