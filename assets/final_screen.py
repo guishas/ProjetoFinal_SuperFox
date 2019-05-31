@@ -16,6 +16,7 @@ def final_screen(screen, assets):
     final_rect = final.get_rect()
     final = pygame.transform.scale(final, (WIDTH, HEIGHT))
     
+    pygame.event.get()
     
     running = True
     while running:
