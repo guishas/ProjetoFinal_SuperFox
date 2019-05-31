@@ -23,9 +23,11 @@ Semana 5 (última):
 - Tela inicial (Feito)
 - Tela final (Feito)
 - Colocar somente uma vida (Feito)
-- Tentar arrumar o mask collide com os blocos
-- Separar arquivos (ou não) (Feito)
-- Arquivo JSON para Highscores
+- Tentar arrumar o mask collide com os blocos (Feito)
+- Separar arquivos (Feito)
+- Arquivo JSON para Highscores (Feito)
+- Nova fase
+- Boss
 - FIM!
 - Semana 6:
 - A GRANDE APRESENTAÇÃO!!! (04/06)
