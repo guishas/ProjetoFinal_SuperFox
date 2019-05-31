@@ -2,9 +2,10 @@
 #Bibliotecas e importações
 import pygame
 from os import path
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, BLACK, QUIT, GAME, INIT
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, BLACK, QUIT, GAME, INIT, DONE
 from init_screen import init_screen
 from game_screen import game_screen        
+from final_screen import final_screen
             
 #função assets (imagens e sons)
 def load_assets(img_dir, snd_dir, fnt_dir):
@@ -57,6 +58,7 @@ def load_assets(img_dir, snd_dir, fnt_dir):
         mob_fly.append(mobfly)
     assets['mob_fly'] = mob_fly
     assets['tela_inicial'] = pygame.image.load(path.join(img_dir, 'tela_inicial.png')).convert()
+    assets['tela_final'] = pygame.image.load(path.join(img_dir, 'tela_final.png')).convert()
     return assets
 
 pygame.init()
@@ -75,6 +77,8 @@ try:
             state = init_screen(screen, assets)
         elif state == GAME:
             state = game_screen(screen, assets)
+        elif state == DONE:
+            state = final_screen(screen, assets)
         else:
             state = QUIT
 

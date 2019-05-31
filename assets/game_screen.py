@@ -4,7 +4,7 @@ Created on Wed May 29 15:18:30 2019
 
 @author: Usuario
 """
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, DONE
 import pygame
 import random
 from os import path
@@ -509,7 +509,7 @@ def game_screen(screen, assets):
         #Loop principal
         PLAYING = 10
         DYING = 11
-        DONE = 12
+        
         
         reloading = False
         
@@ -634,7 +634,7 @@ def game_screen(screen, assets):
                     death_sound.play()
                     player.kill()
                     time.sleep(3)
-                    state = DONE
+                    
                     
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
@@ -665,6 +665,6 @@ def game_screen(screen, assets):
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
     finally:    
-        return QUIT
+        return DONE
 
        
