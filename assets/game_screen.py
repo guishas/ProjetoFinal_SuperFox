@@ -55,6 +55,15 @@ class Player(pygame.sprite.Sprite):
         
         self.parado = self.image
     
+    #Carrega High Score
+    def load_file(self):
+        self.dir = path.dirname(__file__)
+        with open(path.join(self.dir, highscore),'w') as hs:
+            try:
+                self.highscore = int(hs.read())
+            except:
+                self.highscore = 0
+            
     def update(self):
         self.rect.x += self.speedx
         self.speedy -= gravidade
