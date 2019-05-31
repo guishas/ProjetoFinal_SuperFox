@@ -14,7 +14,7 @@ import time
 class Player(pygame.sprite.Sprite):
     
     #Construtor da classe
-    def __init__(self, player_img, fox_walk, fox_jump, all_sprites):
+    def __init__(self, player_img, fox_walk, fox_jump, all_sprites, blocos):
         
         #Construtor da classe pai
         pygame.sprite.Sprite.__init__(self)
@@ -25,8 +25,8 @@ class Player(pygame.sprite.Sprite):
         self.pulando = fox_jump
         
         self.pulando = pygame.transform.scale(fox_jump, (70, 58))
-        self.pulando.set_colorkey(BLACK)
-        
+        self.pulando.set_colorkey(WHITE)
+        self.blocos = blocos
         #Diminuindo o tamanho da imagem
         self.image = pygame.transform.scale(player_img, (70, 58))
         
@@ -62,7 +62,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.speedy
         
         #Define as colisões
-        colisoes = pygame.sprite.spritecollide(self, blocos, False, pygame.sprite.collide_mask)
+        colisoes = pygame.sprite.spritecollide(self, self.blocos, False, pygame.sprite.collide_mask)
         
         #Bota a posição do personagem para antes da colisão
         for colisao in colisoes:
@@ -138,7 +138,7 @@ class Player(pygame.sprite.Sprite):
     
 class Mob(pygame.sprite.Sprite):
     
-    def __init__(self, mob_walk, assets, all_sprites, birds):
+    def __init__(self, mob_walk, assets, all_sprites, mobs):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -146,6 +146,9 @@ class Mob(pygame.sprite.Sprite):
         self.animation = mob_walk
         
         self.image = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
+        self.assets = assets
+        self.all_sprites = all_sprites
+        self.mobs = mobs
         
         teste = self.image
         
@@ -192,7 +195,7 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            mob = Mob(self.assets['mob_walk'])
+            mob = Mob(self.assets['mob_walk'],self.assets, self.all_sprites, self.mobs)
             self.all_sprites.add(mob)
             self.mobs.add(mob)
             
@@ -255,7 +258,7 @@ class Bird(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            bird = Bird(self.assets['mob_fly'])
+            bird = Bird(self.assets['mob_fly'], self.assets, self.all_sprites, self.birds)
             self.all_sprites.add(bird)
             self.birds.add(bird)
         
@@ -458,7 +461,7 @@ def game_screen(screen, assets):
     #Grupo sprites
     all_sprites = pygame.sprite.Group()
     #Cria um player
-    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'], all_sprites)
+    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'], all_sprites, blocos)
     all_sprites.add(player)
     all_sprites.add(pipe)
     all_sprites.add(birds)
@@ -467,12 +470,12 @@ def game_screen(screen, assets):
     
     #Cria mobs
     for i in range(4):
-        mob = Mob(assets['mob_walk'], all_sprites, birds, birds)
+        mob = Mob(assets['mob_walk'],assets, all_sprites, mobs)
         mobs.add(mob)
         all_sprites.add(mob)
         
     for i in range (3):
-        bird = Bird(assets['mob_fly'], all_sprites, birds, birds)
+        bird = Bird(assets['mob_fly'],assets, all_sprites, birds)
         all_sprites.add(bird)
         birds.add(bird)
         
@@ -502,169 +505,168 @@ def game_screen(screen, assets):
     
     
     #comando para evitar travamentos
-    try:
         
-        #Musica do jogo
-        music_sound.play(loops=-1)
-        #Loop principal
-        PLAYING = 10
-        DYING = 11
-        DONE = 12
+    #Musica do jogo
+    music_sound.play(loops=-1)
+    #Loop principal
+    PLAYING = 10
+    DYING = 11
+    DONE = 12
+    
+    reloading = False
+    
+    score = 0
+    lifes = 1
+    state = PARADO
+    ammo = 20
+    startTime = pygame.time.get_ticks()
+    
+    state = PLAYING
+    
+    while state != DONE:
         
-        reloading = False
+        #Ajusta o tick do jogo
+        clock.tick(FPS)
+        #Eventos pygame
+        for event in pygame.event.get():
         
-        score = 0
-        lifes = 1
-        state = PARADO
-        ammo = 20
-        startTime = pygame.time.get_ticks()
-        
-        state = PLAYING
-        
-        while state != DONE:
-            
-            #Ajusta o tick do jogo
-            clock.tick(FPS)
-            #Eventos pygame
-            for event in pygame.event.get():
-            
-                #verifica se foi fechado
-                if event.type == pygame.QUIT:
-                    state = DONE
-                    
+            #verifica se foi fechado
+            if event.type == pygame.QUIT:
+                state = DONE
                 
-                #verifica se apertou alguma tecla
-                elif event.type == pygame.KEYDOWN:
-                    #se apertou alguma tecla muda a velocidade
-                    if event.key == pygame.K_LEFT:
-                        player.speedx -= 4
-                        player.state = ANDANDO
+            
+            #verifica se apertou alguma tecla
+            elif event.type == pygame.KEYDOWN:
+                #se apertou alguma tecla muda a velocidade
+                if event.key == pygame.K_LEFT:
+                    player.speedx -= 4
+                    player.state = ANDANDO
+                    
+                if event.key == pygame.K_RIGHT:
+                    player.speedx += 4
+                    player.state = ANDANDO
+                #Jump
+
+                if event.key == pygame.K_SPACE:
+
+                    if player.rect.bottom == HEIGHT - 80 or player.rect.bottom == HEIGHT - 250 or player.rect.bottom == HEIGHT - 390:
+                        player.state = PULANDO
+                        jump_sound.play()
+                        player.speedy -= 14
                         
-                    if event.key == pygame.K_RIGHT:
-                        player.speedx += 4
-                        player.state = ANDANDO
-                    #Jump
-    
-                    if event.key == pygame.K_SPACE:
-    
-                        if player.rect.bottom == HEIGHT - 80 or player.rect.bottom == HEIGHT - 250 or player.rect.bottom == HEIGHT - 390:
-                            player.state = PULANDO
-                            jump_sound.play()
-                            player.speedy -= 14
+                if not reloading:
+                    if event.key == pygame.K_q:
+                        if ammo > 0:
+                            fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
+                            all_sprites.add(fireball)
+                            fireballs.add(fireball)
+                            fireball_sound.play()
+                            ammo -= 1
+                            if ammo <= 0:
+                                ammo = 0
                             
-                    if not reloading:
-                        if event.key == pygame.K_q:
-                            if ammo > 0:
-                                fireball = Fireball(assets['fireball'], (player.rect.x+50), (player.rect.y+5))
-                                all_sprites.add(fireball)
-                                fireballs.add(fireball)
-                                fireball_sound.play()
-                                ammo -= 1
-                                if ammo <= 0:
-                                    ammo = 0
-                                
-                    if event.key == pygame.K_r and not reloading and ammo < 20:
-                        startTime = pygame.time.get_ticks()
-                        reloading = True
-                        
-                #verifica se soltou alguma tecla
-                elif event.type == pygame.KEYUP:
-                    #se soltou muda a velocidade
-                    if event.key == pygame.K_LEFT:
-                        player.speedx += 4
-                        player.state = PARADO
-                        
-                    if event.key == pygame.K_RIGHT:
-                        player.speedx -= 4
-                        player.state = PARADO
-             
-            if reloading:
-                now = pygame.time.get_ticks()
-                diferenca = now - startTime
-                if diferenca > 2000:
-                    reloading = False
-                    ammo = 20
+                if event.key == pygame.K_r and not reloading and ammo < 20:
+                    startTime = pygame.time.get_ticks()
+                    reloading = True
                     
-            #Atualiza os sprites
-            all_sprites.update()
-            
-            if state == PLAYING:
-            
-                hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
-                if hits:
-                    state = DYING
-                    for i in range(2):
-                        mob = Mob(assets['mob_walk'])
-                        all_sprites.add(mob)
-                        mobs.add(mob)
-                    lifes -= 1
+            #verifica se soltou alguma tecla
+            elif event.type == pygame.KEYUP:
+                #se soltou muda a velocidade
+                if event.key == pygame.K_LEFT:
+                    player.speedx += 4
+                    player.state = PARADO
+                    
+                if event.key == pygame.K_RIGHT:
+                    player.speedx -= 4
+                    player.state = PARADO
+         
+        if reloading:
+            now = pygame.time.get_ticks()
+            diferenca = now - startTime
+            if diferenca > 2000:
+                reloading = False
+                ammo = 20
                 
-                hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
-                for hit in hits:
-                    mob = Mob(assets['mob_walk'])
+        #Atualiza os sprites
+        all_sprites.update()
+        
+        if state == PLAYING:
+        
+            hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
+            if hits:
+                state = DYING
+                for i in range(2):
+                    mob = Mob(assets['mob_walk'], assets, all_sprites, mobs)
                     all_sprites.add(mob)
                     mobs.add(mob)
-                    destruction_sound.play()
-                    explosao = Explosion(hit.rect.center, assets['explosion_anim'])
-                    all_sprites.add(explosao)
-                    score += 100
-                
-                hits = pygame.sprite.spritecollide(player, birds, False, pygame.sprite.collide_mask)
-                if hits:
-                    state = DYING
-                    for i in range(3):
-                        bird = Bird(assets['mob_fly'])
-                        all_sprites.add(bird)
-                        birds.add(bird)
-                    lifes -= 1
-                    
-                        
-                hits = pygame.sprite.groupcollide(birds, fireballs, True, True, pygame.sprite.collide_mask)
-                for hit in hits:
-                    bird = Bird(assets['mob_fly'])
+                lifes -= 1
+            
+            hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
+            for hit in hits:
+                mob = Mob(assets['mob_walk'], assets, all_sprites, birds)
+                all_sprites.add(mob)
+                mobs.add(mob)
+                destruction_sound.play()
+                explosao = Explosion(hit.rect.center, assets['explosion_anim'])
+                all_sprites.add(explosao)
+                score += 100
+            
+            hits = pygame.sprite.spritecollide(player, birds, False, pygame.sprite.collide_mask)
+            if hits:
+                state = DYING
+                for i in range(3):
+                    bird = Bird(assets['mob_fly'], assets, all_sprites, birds)
                     all_sprites.add(bird)
                     birds.add(bird)
-                    destruction_sound.play()
-                    explosao = Explosion(hit.rect.center, assets['explosion_anim'])
-                    all_sprites.add(explosao)
-                    score += 100
-            elif state == DYING:
-                if lifes == 0:
-                    music_sound.stop()
-                    death_sound.play()
-                    player.kill()
-                    time.sleep(3)
-                    state = DONE
-                    
-            #A cada loop redesenha o fundo e os sprites
-            screen.fill(BLACK)
-            screen.blit(background, background_rect)
-            all_sprites.draw(screen)
-            
-            #colocando o score na tela
-            text_surface = score_font.render('{:08d}'.format(score), True, YELLOW)
-            text_rect = text_surface.get_rect()
-            text_rect.midtop = (WIDTH/2, 10)
-            screen.blit(text_surface, text_rect)
-            
-            #colocando a vida na tela
-            text_surface = score_font.render(chr(9829) * lifes, True, YELLOW)
-            text_rect = text_surface.get_rect()
-            text_rect.topleft = (WIDTH - 790, 10)
-            screen.blit(text_surface, text_rect)
+                lifes -= 1
                 
-            #colocando munição na tela
-            text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
-            text_rect = text_surface.get_rect()
-            text_rect.bottomleft = (WIDTH - 140, 45)
-            img_rect = fireballimg.get_rect()
-            img_rect.topright = (WIDTH - 120, 10)
-            screen.blit(text_surface, text_rect)
-            screen.blit(fireballimg, img_rect)
+                    
+            hits = pygame.sprite.groupcollide(birds, fireballs, True, True, pygame.sprite.collide_mask)
+            for hit in hits:
+                bird = Bird(assets['mob_fly'], assets, all_sprites, birds)
+                all_sprites.add(bird)
+                birds.add(bird)
+                destruction_sound.play()
+                explosao = Explosion(hit.rect.center, assets['explosion_anim'])
+                all_sprites.add(explosao)
+                score += 100
+        elif state == DYING:
+            if lifes == 0:
+                music_sound.stop()
+                death_sound.play()
+                player.kill()
+                time.sleep(3)
+                state = DONE
+                
+        #A cada loop redesenha o fundo e os sprites
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)
+        all_sprites.draw(screen)
+        
+        #colocando o score na tela
+        text_surface = score_font.render('{:08d}'.format(score), True, YELLOW)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (WIDTH/2, 10)
+        screen.blit(text_surface, text_rect)
+        
+        #colocando a vida na tela
+        text_surface = score_font.render(chr(9829) * lifes, True, YELLOW)
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (WIDTH - 790, 10)
+        screen.blit(text_surface, text_rect)
             
-            #Depois de desenhar tudo inverte o display
-            pygame.display.flip()
-    finally:    
-        return QUIT
+        #colocando munição na tela
+        text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
+        text_rect = text_surface.get_rect()
+        text_rect.bottomleft = (WIDTH - 140, 45)
+        img_rect = fireballimg.get_rect()
+        img_rect.topright = (WIDTH - 120, 10)
+        screen.blit(text_surface, text_rect)
+        screen.blit(fireballimg, img_rect)
+        
+        #Depois de desenhar tudo inverte o display
+        pygame.display.flip()
+    
+    return QUIT
 
        
