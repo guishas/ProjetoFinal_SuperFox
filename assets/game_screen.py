@@ -4,16 +4,17 @@ Created on Wed May 29 15:18:30 2019
 
 @author: Usuario
 """
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, DONE
 import pygame
 import random
 from os import path
+import time
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
     
     #Construtor da classe
-    def __init__(self, player_img, fox_walk, fox_jump):
+    def __init__(self, player_img, fox_walk, fox_jump, all_sprites):
         
         #Construtor da classe pai
         pygame.sprite.Sprite.__init__(self)
@@ -146,7 +147,7 @@ class Player(pygame.sprite.Sprite):
     
 class Mob(pygame.sprite.Sprite):
     
-    def __init__(self, mob_walk):
+    def __init__(self, mob_walk, assets, all_sprites, birds):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -200,19 +201,22 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            mob = Mob(assets['mob_walk'])
-            all_sprites.add(mob)
-            mobs.add(mob)
+            mob = Mob(self.assets['mob_walk'])
+            self.all_sprites.add(mob)
+            self.mobs.add(mob)
             
 class Bird(pygame.sprite.Sprite):
     
-    def __init__(self, mob_fly):
+    def __init__(self, mob_fly, assets, all_sprites, birds):
         
         pygame.sprite.Sprite.__init__(self)
         
         self.animation = mob_fly
         
         self.image = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
+        self.assets = assets
+        self.all_sprites = all_sprites
+        self.birds = birds
         
         teste = self.image
         
@@ -237,6 +241,7 @@ class Bird(pygame.sprite.Sprite):
         
         self.rect.x += self.speedx
         
+        
         now = pygame.time.get_ticks()
         
         elapsed_ticks = now - self.last_update
@@ -259,9 +264,9 @@ class Bird(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            bird = Bird(assets['mob_fly'])
-            all_sprites.add(bird)
-            birds.add(bird)
+            bird = Bird(self.assets['mob_fly'])
+            self.all_sprites.add(bird)
+            self.birds.add(bird)
         
         
 class Pipes(pygame.sprite.Sprite):
@@ -286,7 +291,7 @@ class Pipes(pygame.sprite.Sprite):
 
 class BlocoTijolo(pygame.sprite.Sprite):
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, assets):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -312,7 +317,7 @@ listaPosicaoBlocos=[(100, 250), (140, 250), (180, 250),(260, 250),(220, 110),(26
 
 class BlocoAmarelo(pygame.sprite.Sprite):
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, assets):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -335,7 +340,7 @@ listaPosicaoBlocosAmarelos=[(220, 250),(300, 110)]
 
 class BlocoUsado(pygame.sprite.Sprite):
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, assets):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -447,8 +452,7 @@ def game_screen(screen, assets):
     death_sound = assets['death_sound']
     destruction_sound = assets['destruction_sound']
     
-    #Cria um player
-    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'])
+
     
     #Cria coisas
     pipe = Pipes(assets['pipe_img'])
@@ -462,31 +466,34 @@ def game_screen(screen, assets):
     
     #Grupo sprites
     all_sprites = pygame.sprite.Group()
+    #Cria um player
+    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'], all_sprites)
     all_sprites.add(player)
     all_sprites.add(pipe)
     all_sprites.add(birds)
     all_sprites.add(mobs)
     
+    
     #Cria mobs
     for i in range(4):
-        mob = Mob(assets['mob_walk'])
+        mob = Mob(assets['mob_walk'], all_sprites, birds, birds)
         mobs.add(mob)
         all_sprites.add(mob)
         
     for i in range (3):
-        bird = Bird(assets['mob_fly'])
+        bird = Bird(assets['mob_fly'], all_sprites, birds, birds)
         all_sprites.add(bird)
         birds.add(bird)
         
     #Cria blocos
     for x in range(0, len(listaPosicaoBlocos), 1):
-        bloco=BlocoTijolo(listaPosicaoBlocos[x][0], listaPosicaoBlocos[x][1])
+        bloco=BlocoTijolo(listaPosicaoBlocos[x][0], listaPosicaoBlocos[x][1], assets)
         all_sprites.add(bloco)
         blocos.add(bloco)
     
     #Cria blocos amarelos(itens)
     for x in range(0, len(listaPosicaoBlocosAmarelos), 1):
-        blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1])
+        blocoItem=BlocoAmarelo(listaPosicaoBlocosAmarelos[x][0], listaPosicaoBlocosAmarelos[x][1], assets)
         all_sprites.add(blocoItem)
         blocos.add(blocoItem)
     
@@ -511,7 +518,7 @@ def game_screen(screen, assets):
         #Loop principal
         PLAYING = 10
         DYING = 11
-        DONE = 12
+        
         
         reloading = False
         
@@ -636,7 +643,7 @@ def game_screen(screen, assets):
                     death_sound.play()
                     player.kill()
                     time.sleep(3)
-                    state = DONE
+                    
                     
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
@@ -654,7 +661,12 @@ def game_screen(screen, assets):
             text_rect = text_surface.get_rect()
             text_rect.topleft = (WIDTH - 790, 10)
             screen.blit(text_surface, text_rect)
-                
+            
+            #colocando Highscore na tela
+            text_surface = score_font.render(' HIGHSCORE: {0}'.format(highscore), True, YELLOW)
+            text_rect = text_surface.get_rect()
+            text_rect.topright = (WIDTH -10, 10)
+            
             #colocando munição na tela
             text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
             text_rect = text_surface.get_rect()
@@ -666,7 +678,7 @@ def game_screen(screen, assets):
             
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
-        
-    return QUIT
+    finally:    
+        return DONE
 
        

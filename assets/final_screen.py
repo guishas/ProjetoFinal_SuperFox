@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 29 14:59:25 2019
+Created on Fri May 31 07:43:06 2019
 
 @author: Usuario
 """
@@ -8,12 +8,12 @@ Created on Wed May 29 14:59:25 2019
 from config import QUIT, GAME, BLACK, FPS
 import pygame
 
-def init_screen(screen, assets):
+def final_screen(screen, assets):
     
     clock = pygame.time.Clock()
     
-    inicio = assets['tela_inicial']
-    inicio_rect = inicio.get_rect()
+    final = assets['tela_final']
+    final_rect = final.get_rect()
     
     running = True
     while running:
@@ -31,9 +31,8 @@ def init_screen(screen, assets):
                 running = False
             
         screen.fill(BLACK)
-        screen.blit(inicio, inicio_rect)
+        screen.blit(final, final_rect)
         
         pygame.display.flip()
         
     return state
-    
