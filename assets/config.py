@@ -36,3 +36,5 @@ SHOOTING = 5
 QUIT = 6
 GAME = 7
 INIT = 8
+
+DONE = 15
