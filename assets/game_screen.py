@@ -14,7 +14,7 @@ import time
 class Player(pygame.sprite.Sprite):
     
     #Construtor da classe
-    def __init__(self, player_img, fox_walk, fox_jump, all_sprites):
+    def __init__(self, player_img, fox_walk, fox_jump, all_sprites, blocos):
         
         #Construtor da classe pai
         pygame.sprite.Sprite.__init__(self)
@@ -25,8 +25,8 @@ class Player(pygame.sprite.Sprite):
         self.pulando = fox_jump
         
         self.pulando = pygame.transform.scale(fox_jump, (70, 58))
-        self.pulando.set_colorkey(BLACK)
-        
+        self.pulando.set_colorkey(WHITE)
+        self.blocos = blocos
         #Diminuindo o tamanho da imagem
         self.image = pygame.transform.scale(player_img, (70, 58))
         
@@ -71,7 +71,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.speedy
         
         #Define as colisões
-        colisoes = pygame.sprite.spritecollide(self, blocos, False, pygame.sprite.collide_mask)
+        colisoes = pygame.sprite.spritecollide(self, self.blocos, False, pygame.sprite.collide_mask)
         
         #Bota a posição do personagem para antes da colisão
         for colisao in colisoes:
@@ -147,7 +147,7 @@ class Player(pygame.sprite.Sprite):
     
 class Mob(pygame.sprite.Sprite):
     
-    def __init__(self, mob_walk, assets, all_sprites, birds):
+    def __init__(self, mob_walk, assets, all_sprites, mobs):
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -155,6 +155,9 @@ class Mob(pygame.sprite.Sprite):
         self.animation = mob_walk
         
         self.image = pygame.image.load(path.join(img_dir, 'fox_static.png')).convert()
+        self.assets = assets
+        self.all_sprites = all_sprites
+        self.mobs = mobs
         
         teste = self.image
         
@@ -201,7 +204,7 @@ class Mob(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            mob = Mob(self.assets['mob_walk'])
+            mob = Mob(self.assets['mob_walk'],self.assets, self.all_sprites, self.mobs)
             self.all_sprites.add(mob)
             self.mobs.add(mob)
             
@@ -264,7 +267,7 @@ class Bird(pygame.sprite.Sprite):
         
         if self.rect.x < 0:
             self.kill()
-            bird = Bird(self.assets['mob_fly'])
+            bird = Bird(self.assets['mob_fly'], self.assets, self.all_sprites, self.birds)
             self.all_sprites.add(bird)
             self.birds.add(bird)
         
@@ -459,7 +462,6 @@ def game_screen(screen, assets):
     
     #Grupos Geral
     blocos = pygame.sprite.Group()
-    pipes = pygame.sprite.Group()
     mobs = pygame.sprite.Group()
     fireballs = pygame.sprite.Group()
     birds = pygame.sprite.Group()
@@ -467,7 +469,7 @@ def game_screen(screen, assets):
     #Grupo sprites
     all_sprites = pygame.sprite.Group()
     #Cria um player
-    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'], all_sprites)
+    player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'], all_sprites, blocos)
     all_sprites.add(player)
     all_sprites.add(pipe)
     all_sprites.add(birds)
@@ -476,12 +478,12 @@ def game_screen(screen, assets):
     
     #Cria mobs
     for i in range(4):
-        mob = Mob(assets['mob_walk'], all_sprites, birds, birds)
+        mob = Mob(assets['mob_walk'],assets, all_sprites, mobs)
         mobs.add(mob)
         all_sprites.add(mob)
         
     for i in range (3):
-        bird = Bird(assets['mob_fly'], all_sprites, birds, birds)
+        bird = Bird(assets['mob_fly'],assets, all_sprites, birds)
         all_sprites.add(bird)
         birds.add(bird)
         
@@ -511,6 +513,7 @@ def game_screen(screen, assets):
     
     
     #comando para evitar travamentos
+
     try:
         
         #Musica do jogo
@@ -519,11 +522,12 @@ def game_screen(screen, assets):
         PLAYING = 10
         DYING = 11
         
+
         
+    
         reloading = False
         
         score = 0
-        lifes = 1
         state = PARADO
         ammo = 20
         startTime = pygame.time.get_ticks()
@@ -602,15 +606,10 @@ def game_screen(screen, assets):
                 hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
                 if hits:
                     state = DYING
-                    for i in range(2):
-                        mob = Mob(assets['mob_walk'])
-                        all_sprites.add(mob)
-                        mobs.add(mob)
-                    lifes -= 1
                 
                 hits = pygame.sprite.groupcollide(mobs, fireballs, True, True, pygame.sprite.collide_mask)
                 for hit in hits:
-                    mob = Mob(assets['mob_walk'])
+                    mob = Mob(assets['mob_walk'], assets, all_sprites, birds)
                     all_sprites.add(mob)
                     mobs.add(mob)
                     destruction_sound.play()
@@ -620,17 +619,11 @@ def game_screen(screen, assets):
                 
                 hits = pygame.sprite.spritecollide(player, birds, False, pygame.sprite.collide_mask)
                 if hits:
-                    state = DYING
-                    for i in range(3):
-                        bird = Bird(assets['mob_fly'])
-                        all_sprites.add(bird)
-                        birds.add(bird)
-                    lifes -= 1
-                    
+                    state = DYING                      
                         
                 hits = pygame.sprite.groupcollide(birds, fireballs, True, True, pygame.sprite.collide_mask)
                 for hit in hits:
-                    bird = Bird(assets['mob_fly'])
+                    bird = Bird(assets['mob_fly'], assets, all_sprites, birds)
                     all_sprites.add(bird)
                     birds.add(bird)
                     destruction_sound.play()
@@ -638,12 +631,11 @@ def game_screen(screen, assets):
                     all_sprites.add(explosao)
                     score += 100
             elif state == DYING:
-                if lifes == 0:
-                    music_sound.stop()
-                    death_sound.play()
-                    player.kill()
-                    time.sleep(3)
-                    
+                music_sound.stop()
+                death_sound.play()
+                player.kill()
+                time.sleep(3)
+                state = DONE
                     
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
@@ -655,6 +647,7 @@ def game_screen(screen, assets):
             text_rect = text_surface.get_rect()
             text_rect.midtop = (WIDTH/2, 10)
             screen.blit(text_surface, text_rect)
+<<<<<<< HEAD
             
             #colocando a vida na tela
             text_surface = score_font.render(chr(9829) * lifes, True, YELLOW)
@@ -667,6 +660,10 @@ def game_screen(screen, assets):
             text_rect = text_surface.get_rect()
             text_rect.topright = (WIDTH -10, 10)
             
+=======
+                
+    
+>>>>>>> 254dabe9cf4ec2afb44dbbcfd9e32db443d90034
             #colocando munição na tela
             text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
             text_rect = text_surface.get_rect()
@@ -678,7 +675,9 @@ def game_screen(screen, assets):
             
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
+
     finally:    
         return DONE
+
 
        
