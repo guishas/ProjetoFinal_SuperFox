@@ -543,8 +543,6 @@ def game_screen(screen, assets):
         PLAYING = 10
         DYING = 11
         
-
-        
     
         reloading = False
         
@@ -662,9 +660,6 @@ def game_screen(screen, assets):
                 state = DONE
                 with open('highscores.txt', 'w') as arq:
                     json.dump(highscore, arq)
-                
-               
-            
             
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
@@ -697,10 +692,7 @@ def game_screen(screen, assets):
             
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
-            
-            
+                    
     finally:    
         return state
-
-
-       
+    
