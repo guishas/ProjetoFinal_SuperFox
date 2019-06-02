@@ -58,15 +58,6 @@ class Player(pygame.sprite.Sprite):
         self.parado = self.image
         
         self.mask = pygame.mask.from_surface(self.image)
-    
-    #Carrega High Score
-    def load_file(self):
-        self.dir = path.dirname(__file__)
-        with open(path.join(self.dir, highscore),'w') as hs:
-            try:
-                self.highscore = int(hs.read())
-            except:
-                self.highscore = 0
             
     def update(self):
         self.rect.x += self.speedx
@@ -692,7 +683,8 @@ def game_screen(screen, assets):
             highscore_rect = highscore_surface.get_rect()
             highscore_surface = pygame.transform.scale(highscore_surface, (175, 20))
             highscore_rect.topleft = (10, 10)
-            screen.blit(highscore_surface, highscore_rect)                
+            screen.blit(highscore_surface, highscore_rect)
+                
 
             #colocando munição na tela
             text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
