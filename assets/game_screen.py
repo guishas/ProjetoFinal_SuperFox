@@ -686,33 +686,14 @@ def game_screen(screen, assets):
             text_rect = text_surface.get_rect()
             text_rect.midtop = (WIDTH/2, 10)
             screen.blit(text_surface, text_rect)
-<<<<<<< HEAD
-            
+
             #colocando highscore na tela
             highscore_surface = score_font.render('HIGHSCORE: {}'.format(highscore[0]), True, YELLOW)
             highscore_rect = highscore_surface.get_rect()
             highscore_surface = pygame.transform.scale(highscore_surface, (175, 20))
             highscore_rect.topleft = (10, 10)
             screen.blit(highscore_surface, highscore_rect)                
-=======
-<<<<<<< HEAD
-            
-            #colocando a vida na tela
-            text_surface = score_font.render(chr(9829) * lifes, True, YELLOW)
-            text_rect = text_surface.get_rect()
-            text_rect.topleft = (WIDTH - 790, 10)
-            screen.blit(text_surface, text_rect)
-            
-            #colocando Highscore na tela
-            text_surface = score_font.render(' HIGHSCORE: {0}'.format(highscore), True, YELLOW)
-            text_rect = text_surface.get_rect()
-            text_rect.topright = (WIDTH -10, 10)
-            
-=======
-                
->>>>>>> 683b16ef5efa81fc511f5cb4a6b4556edad9c71a
-    
->>>>>>> 254dabe9cf4ec2afb44dbbcfd9e32db443d90034
+
             #colocando munição na tela
             text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
             text_rect = text_surface.get_rect()
