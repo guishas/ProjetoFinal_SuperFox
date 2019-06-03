@@ -18,7 +18,7 @@ def load_assets(img_dir, snd_dir, fnt_dir):
     for i in range(1, 3, 1):
         filename = 'fox_walk{}.png'.format(i)
         walk = pygame.image.load(path.join(img_dir, filename)).convert()
-        walk = pygame.transform.scale(walk, (70, 58))
+        walk = pygame.transform.scale(walk, (48, 60))
         walk.set_colorkey(BLACK)
         fox_walk.append(walk)
     assets['fox_walk'] = fox_walk

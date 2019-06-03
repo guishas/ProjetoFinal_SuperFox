@@ -21,6 +21,7 @@ FPS = 60
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
+BLUE = (100, 149, 237)
 
 #Gravidade
 gravidade = -0.5
@@ -36,4 +37,5 @@ SHOOTING = 5
 QUIT = 6
 GAME = 7
 INIT = 8
+
 DONE = 15
