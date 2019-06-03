@@ -9,6 +9,7 @@ import pygame
 import random
 from os import path
 import time
+import json
 
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
@@ -506,7 +507,9 @@ def game_screen(screen, assets):
     #comando para evitar travamentos
 
     try:
-        
+        #highscore
+        with open('highscores.txt', 'r') as arq:
+            highscore = json.load(arq)
         #Musica do jogo
         music_sound.play(loops=-1)
         #Loop principal
@@ -622,11 +625,15 @@ def game_screen(screen, assets):
                     all_sprites.add(explosao)
                     score += 100
             elif state == DYING:
+                highscore.append(score)
+                highscore.sort(reverse=True)
                 music_sound.stop()
                 death_sound.play()
                 player.kill()
                 time.sleep(3)
                 state = DONE
+                with open('highscores.txt', 'w') as arq:
+                    json.dump(highscore, arq)
                     
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
@@ -648,6 +655,13 @@ def game_screen(screen, assets):
             img_rect.topright = (WIDTH - 120, 10)
             screen.blit(text_surface, text_rect)
             screen.blit(fireballimg, img_rect)
+            
+            #Colocando highscore na tela
+            highscore_surface = score_font.render('HIGHSCORE: {}'.format(highscore[0]), True, YELLOW)
+            highscore_rect = highscore_surface.get_rect()
+            highscore_surface = pygame.transform.scale(highscore_surface, (175,20))
+            highscore_rect.topleft = (10,10)
+            screen.blit(highscore_surface, highscore_rect)
             
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
