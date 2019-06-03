@@ -25,11 +25,11 @@ class Player(pygame.sprite.Sprite):
         self.walking = fox_walk
         self.pulando = fox_jump
         
-        self.pulando = pygame.transform.scale(fox_jump, (70, 58))
+        self.pulando = pygame.transform.scale(fox_jump, (48, 60))
         self.pulando.set_colorkey(WHITE)
         self.blocos = blocos
         #Diminuindo o tamanho da imagem
-        self.image = pygame.transform.scale(player_img, (70, 58))
+        self.image = pygame.transform.scale(player_img, (48, 60))
         
         #Deixando transparente
         self.image.set_colorkey(BLACK)
