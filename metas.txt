@@ -26,7 +26,6 @@ Semana 5 (última):
 - Tentar arrumar o mask collide com os blocos (Feito)
 - Separar arquivos (Feito)
 - Arquivo JSON para Highscores (Feito)
-- Nova fase
 - Boss
 - FIM!
 - Semana 6:
