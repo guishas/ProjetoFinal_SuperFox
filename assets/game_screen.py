@@ -4,7 +4,7 @@ Created on Wed May 29 15:18:30 2019
 
 @author: Usuario
 """
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, DONE, BLUE
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, DONE
 import pygame
 import random
 from os import path
@@ -25,11 +25,11 @@ class Player(pygame.sprite.Sprite):
         self.walking = fox_walk
         self.pulando = fox_jump
         
-        self.pulando = pygame.transform.scale(fox_jump, (48, 60))
+        self.pulando = pygame.transform.scale(fox_jump, (70, 58))
         self.pulando.set_colorkey(WHITE)
         self.blocos = blocos
         #Diminuindo o tamanho da imagem
-        self.image = pygame.transform.scale(player_img, (48, 60))
+        self.image = pygame.transform.scale(player_img, (70, 58))
         
         #Deixando transparente
         self.image.set_colorkey(BLACK)
@@ -56,27 +56,24 @@ class Player(pygame.sprite.Sprite):
         self.frame_ticks = 200
         
         self.parado = self.image
-        
-        self.mask = pygame.mask.from_surface(self.image)
-            
+    
     def update(self):
         self.rect.x += self.speedx
         self.speedy -= gravidade
         self.rect.y += self.speedy
         
         #Define as colisões
-        colisoes = pygame.sprite.spritecollide(self, self.blocos, False)
+        colisoes = pygame.sprite.spritecollide(self, self.blocos, False, pygame.sprite.collide_mask)
         
         #Bota a posição do personagem para antes da colisão
-        if colisoes:
-            colisao = colisoes[0]
+        for colisao in colisoes:
             #Indo para baixo
             if self.speedy > 0:
                 self.rect.bottom = colisao.rect.top
                 # Se colidiu com algo, para de cair
                 self.speedy = 0
                 # Atualiza o estado para parado
-                #self.state = PARADO
+                self.state = PARADO
             # Estava indo para cima
             elif self.speedy < 0:
                 self.rect.top = colisao.rect.bottom
@@ -165,7 +162,7 @@ class Mob(pygame.sprite.Sprite):
         self.rect.x = random.randrange(860, 900)
         self.rect.bottom = HEIGHT - 85
         
-        self.speedx = random.randrange(-5, -1)
+        self.speedx = random.randrange(-5, -2)
         
         self.frame = 0
    
@@ -227,7 +224,7 @@ class Bird(pygame.sprite.Sprite):
         self.rect.x = random.randrange(860, 900)
         self.rect.bottom = HEIGHT - 280
         
-        self.speedx = random.randrange(-5, -1)
+        self.speedx = random.randrange(-5, -2)
         
         self.frame = 0
    
@@ -281,26 +278,6 @@ class Pipes(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, 90)
         
         self.image.set_colorkey(BLACK)
-        
-        self.rect = self.image.get_rect()
-        
-        self.rect.x = 740
-        self.rect.y = HEIGHT - 150
-        
-class PipesFundo(pygame.sprite.Sprite):
-    
-    def __init__(self, pipe_img):
-        
-        pygame.sprite.Sprite.__init__(self)
-        
-        #imagem
-        self.image = pipe_img
-        
-        self.image = pygame.transform.scale(pipe_img, (70, 60))
-        
-        self.image = pygame.transform.rotate(self.image, 90)
-        
-        self.image.fill(BLUE)
         
         self.rect = self.image.get_rect()
         
@@ -474,10 +451,8 @@ def game_screen(screen, assets):
     
     #Cria coisas
     pipe = Pipes(assets['pipe_img'])
-    pipefundo = PipesFundo(assets['pipe_img'])
     
     #Grupos Geral
-    pipes = pygame.sprite.Group()
     blocos = pygame.sprite.Group()
     mobs = pygame.sprite.Group()
     fireballs = pygame.sprite.Group()
@@ -488,18 +463,18 @@ def game_screen(screen, assets):
     #Cria um player
     player = Player(assets['player_img'], assets['fox_walk'], assets['fox_jump'], all_sprites, blocos)
     all_sprites.add(player)
+    all_sprites.add(pipe)
     all_sprites.add(birds)
     all_sprites.add(mobs)
-    pipes.add(pipefundo)
-    pipes.add(pipe)
-
+    
+    
     #Cria mobs
-    for i in range(5):
+    for i in range(4):
         mob = Mob(assets['mob_walk'],assets, all_sprites, mobs)
         mobs.add(mob)
         all_sprites.add(mob)
         
-    for i in range (4):
+    for i in range (3):
         bird = Bird(assets['mob_fly'],assets, all_sprites, birds)
         all_sprites.add(bird)
         birds.add(bird)
@@ -532,16 +507,16 @@ def game_screen(screen, assets):
     #comando para evitar travamentos
 
     try:
-        
+        #highscore
         with open('highscores.txt', 'r') as arq:
             highscore = json.load(arq)
-        
-        
         #Musica do jogo
         music_sound.play(loops=-1)
         #Loop principal
         PLAYING = 10
         DYING = 11
+        
+
         
     
         reloading = False
@@ -649,7 +624,6 @@ def game_screen(screen, assets):
                     explosao = Explosion(hit.rect.center, assets['explosion_anim'])
                     all_sprites.add(explosao)
                     score += 100
-            
             elif state == DYING:
                 highscore.append(score)
                 highscore.sort(reverse=True)
@@ -660,27 +634,19 @@ def game_screen(screen, assets):
                 state = DONE
                 with open('highscores.txt', 'w') as arq:
                     json.dump(highscore, arq)
-            
+                    
             #A cada loop redesenha o fundo e os sprites
             screen.fill(BLACK)
             screen.blit(background, background_rect)
             all_sprites.draw(screen)
-            pipes.draw(screen)
             
             #colocando o score na tela
             text_surface = score_font.render('{:08d}'.format(score), True, YELLOW)
             text_rect = text_surface.get_rect()
             text_rect.midtop = (WIDTH/2, 10)
             screen.blit(text_surface, text_rect)
-
-            #colocando highscore na tela
-            highscore_surface = score_font.render('HIGHSCORE: {}'.format(highscore[0]), True, YELLOW)
-            highscore_rect = highscore_surface.get_rect()
-            highscore_surface = pygame.transform.scale(highscore_surface, (175, 20))
-            highscore_rect.topleft = (10, 10)
-            screen.blit(highscore_surface, highscore_rect)
                 
-
+    
             #colocando munição na tela
             text_surface = score_font.render(' X{0}'.format(ammo), True, BLACK)
             text_rect = text_surface.get_rect()
@@ -690,9 +656,18 @@ def game_screen(screen, assets):
             screen.blit(text_surface, text_rect)
             screen.blit(fireballimg, img_rect)
             
+            #Colocando highscore na tela
+            highscore_surface = score_font.render('HIGHSCORE: {}'.format(highscore[0]), True, YELLOW)
+            highscore_rect = highscore_surface.get_rect()
+            highscore_surface = pygame.transform.scale(highscore_surface, (175,20))
+            highscore_rect.topleft = (10,10)
+            screen.blit(highscore_surface, highscore_rect)
+            
             #Depois de desenhar tudo inverte o display
             pygame.display.flip()
-                    
+
     finally:    
-        return state
-    
+        return DONE
+
+
+       
