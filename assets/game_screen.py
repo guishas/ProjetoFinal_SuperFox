@@ -4,7 +4,7 @@ Created on Wed May 29 15:18:30 2019
 
 @author: Usuario
 """
-from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, DONE
+from config import img_dir, snd_dir, fnt_dir, WIDTH, HEIGHT, FPS, BLACK, WHITE, YELLOW, gravidade, PARADO, PULANDO, ANDANDO, NO_PULO, CAINDO, SHOOTING, QUIT, DONE, BLOCO
 import pygame
 import random
 from os import path
@@ -295,7 +295,7 @@ class BlocoTijolo(pygame.sprite.Sprite):
         self.image = brick_img
         
         #Diminuindo a imagem
-        self.image = pygame.transform.scale(brick_img, (40, 40))
+        self.image = pygame.transform.scale(brick_img, BLOCO)
         
         #Imagem transparente
         self.image.set_colorkey(BLACK)
@@ -320,7 +320,7 @@ class BlocoAmarelo(pygame.sprite.Sprite):
         blocoItem_img = assets['bloco_item']
         self.image = blocoItem_img
         
-        self.image = pygame.transform.scale(blocoItem_img, (40, 40))
+        self.image = pygame.transform.scale(blocoItem_img, BLOCO)
         
         self.image.set_colorkey(BLACK)
         
@@ -342,7 +342,7 @@ class BlocoUsado(pygame.sprite.Sprite):
         blocoUsado_img = assets['bloco_usado']
         self.image = blocoUsado_img
         
-        self.image = pygame.transform.scale(blocoUsado_img, (40, 40))
+        self.image = pygame.transform.scale(blocoUsado_img, BLOCO)
         
         self.image.set_colorkey(BLACK)
         

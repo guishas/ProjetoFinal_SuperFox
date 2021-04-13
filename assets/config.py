@@ -39,3 +39,6 @@ GAME = 7
 INIT = 8
 
 DONE = 15
+
+#Tamanho do Bloco
+BLOCO = (40, 40)
