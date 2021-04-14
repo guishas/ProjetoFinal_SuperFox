@@ -5,6 +5,9 @@ Created on Fri May 31 07:43:06 2019
 @author: Usuario
 """
 
+
+
+
 from config import QUIT, GAME, BLACK, FPS, WIDTH, HEIGHT
 import pygame
 

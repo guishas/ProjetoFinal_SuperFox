@@ -11,6 +11,7 @@ from os import path
 import time
 import json
 
+
 #Classe jogador que representa a raposa
 class Player(pygame.sprite.Sprite):
     
