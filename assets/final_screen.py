@@ -5,17 +5,14 @@ Created on Fri May 31 07:43:06 2019
 @author: Usuario
 """
 
-
-
-
 from config import QUIT, GAME, BLACK, FPS, WIDTH, HEIGHT
 import pygame
 
-def final_screen(screen, assets):
+def final_screen(screen, assets_img, assets_snd, assets_fnt):
     
     clock = pygame.time.Clock()
     
-    final = assets['tela_final']
+    final = assets_img['tela_final']
     final_rect = final.get_rect()
     final = pygame.transform.scale(final, (WIDTH, HEIGHT))
     
